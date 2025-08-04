@@ -1,7 +1,10 @@
 package com.example.ondongnae.backend.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,23 +14,22 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Store {
+public class SubCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @OneToMany(mappedBy = "store")
-    private List<CourseStore> courseStores =  new ArrayList<>();
-
-    @OneToMany(mappedBy = "store")
-    private List<Menu> menus = new ArrayList<>();
+    private String name_ko;
+    private String name_en;
+    private String name_zh;
+    private String name_ja;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="main_category_id")
     private MainCategory mainCategory;
 
-    @OneToMany(mappedBy = "store")
+    @OneToMany(mappedBy = "subCategory")
     private List<StoreSubCategory> storeSubCategories = new ArrayList<>();
 
 }
