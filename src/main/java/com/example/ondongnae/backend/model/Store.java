@@ -19,4 +19,8 @@ public class Store {
 
     @OneToMany(mappedBy = "store")
     private List<CourseStore> courseStores =  new ArrayList<>();
+
+    @OneToMany(mappedBy = "store")
+    private List<Menu> menus = new ArrayList<>();
+
 }
