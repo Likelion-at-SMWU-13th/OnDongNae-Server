@@ -20,10 +20,14 @@ public class SubCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(nullable = false)
     private String name_ko;
+    @Column(nullable = false)
     private String name_en;
-    private String name_zh;
+    @Column(nullable = false)
     private String name_ja;
+    @Column(nullable = false)
+    private String name_zh;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="main_category_id")

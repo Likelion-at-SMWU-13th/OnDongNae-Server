@@ -20,9 +20,13 @@ public class Allergy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String label_ko;
+    @Column(nullable = false)
     private String label_en;
+    @Column(nullable = false)
     private String label_ja;
+    @Column(nullable = false)
     private String label_zh;
 
     @OneToMany(mappedBy = "allergy")

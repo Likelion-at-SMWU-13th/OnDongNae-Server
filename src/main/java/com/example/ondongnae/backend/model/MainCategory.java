@@ -20,9 +20,13 @@ public class MainCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(nullable = false)
     private String name_ko;
+    @Column(nullable = false)
     private String name_en;
+    @Column(nullable = false)
     private String name_ja;
+    @Column(nullable = false)
     private String name_zh;
 
     @OneToMany(mappedBy = "mainCategory")

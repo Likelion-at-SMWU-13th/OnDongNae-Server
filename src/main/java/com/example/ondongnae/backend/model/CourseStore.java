@@ -14,8 +14,8 @@ public class CourseStore {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name="order_number")
-    private long order;
+    @Column(name="order_number", nullable=false)
+    private long order = 1;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="store_id")

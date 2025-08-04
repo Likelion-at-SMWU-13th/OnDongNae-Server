@@ -27,9 +27,13 @@ public class Menu {
     @JoinColumn(name="store_id")
     private Store store;
 
+    @Column(nullable = false)
     private String name_ko;
+    @Column(nullable = false)
     private String name_en;
+    @Column(nullable = false)
     private String name_zh;
+    @Column(nullable = false)
     private String name_ja;
 
     private int price_krw;
