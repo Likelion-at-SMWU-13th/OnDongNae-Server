@@ -1,10 +1,10 @@
-package com.example.ondongnae.backend.model;
+package com.example.ondongnae.backend.allergy.model;
 
+import com.example.ondongnae.backend.menu.model.MenuAllergy;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +21,13 @@ public class Allergy {
 
     @Column(nullable = false)
     private String label_ko;
+
     @Column(nullable = false)
     private String label_en;
+
     @Column(nullable = false)
     private String label_ja;
+
     @Column(nullable = false)
     private String label_zh;
 

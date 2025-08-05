@@ -1,5 +1,6 @@
-package com.example.ondongnae.backend.model;
+package com.example.ondongnae.backend.course.model;
 
+import com.example.ondongnae.backend.store.model.Store;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +12,7 @@ public class CourseStore {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(name="order_number", nullable=false)
     private long order = 1;
