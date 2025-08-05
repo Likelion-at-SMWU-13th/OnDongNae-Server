@@ -1,5 +1,6 @@
-package com.example.ondongnae.backend.model;
+package com.example.ondongnae.backend.category.model;
 
+import com.example.ondongnae.backend.store.model.Store;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,26 +13,28 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubCategory {
+public class MainCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(nullable = false)
     private String name_ko;
+
     @Column(nullable = false)
     private String name_en;
+
     @Column(nullable = false)
     private String name_ja;
+
     @Column(nullable = false)
     private String name_zh;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="main_category_id")
-    private MainCategory mainCategory;
+    @OneToMany(mappedBy = "mainCategory")
+    private List<Store> stores = new ArrayList<>();
 
-    @OneToMany(mappedBy = "subCategory")
-    private List<StoreSubCategory> storeSubCategories = new ArrayList<>();
+    @OneToMany(mappedBy = "mainCategory")
+    private List<SubCategory> subCategories = new ArrayList<>();
 
 }
