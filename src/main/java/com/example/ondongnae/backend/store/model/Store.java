@@ -41,6 +41,9 @@ public class Store {
     private MainCategory mainCategory;
 
     @OneToMany(mappedBy = "store")
+    private List<StoreImage> storeImages = new ArrayList<>();
+
+    @OneToMany(mappedBy = "store")
     private List<StoreSubCategory> storeSubCategories = new ArrayList<>();
 
     @Column(nullable = false)
