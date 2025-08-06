@@ -22,6 +22,7 @@ public class AuthService {
         String password1 = signUpDto.getPassword1();
         String password2 = signUpDto.getPassword2();
         String phoneNum = signUpDto.getPhoneNum();
+        String loginId = signUpDto.getLoginId();
 
         if (!password1.equals(password2)) {
             return -1;
@@ -35,8 +36,12 @@ public class AuthService {
             return -3;
         }
 
+        if (memberRepository.existsByLoginId(loginId)) {
+            return -4;
+        }
+
         Member member = Member.builder()
-                .login_id(signUpDto.getLoginId())
+                .loginId(signUpDto.getLoginId())
                 .password(password1)
                 .name(signUpDto.getName())
                 .phone(signUpDto.getPhoneNum())
@@ -49,4 +54,12 @@ public class AuthService {
         return savedMember.getId();
     }
 
+    public boolean login(String id, String password) {
+        System.out.println(id + password);
+        Member member = memberRepository.findByLoginId(id);
+        System.out.println(member);
+        if (member == null) { return false; }
+        if (!member.getPassword().equals(password)) { return false; }
+        else { return true; }
+    }
 }

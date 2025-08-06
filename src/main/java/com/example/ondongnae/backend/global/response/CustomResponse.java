@@ -28,9 +28,14 @@ public class CustomResponse<T> {
         return new CustomResponse<T>(httpStatus, message, success, data);
     }
 
-    // 200 OK
+    // 200 OK 데이터 O
     public static <T> CustomResponse<T>  ok(String message, T data) {
         return new CustomResponse<T>(HttpStatus.OK, message, true, data);
+    }
+
+    // 200 OK 데이터 X
+    public static <T> CustomResponse<T>  ok(String message) {
+        return new CustomResponse<T>(HttpStatus.OK, message, true);
     }
 
     // 201 CREATED
