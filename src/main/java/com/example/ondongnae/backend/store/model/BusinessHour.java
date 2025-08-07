@@ -25,9 +25,9 @@ public class BusinessHour {
     @Column(name = "day_of_week", nullable = false)
     private DayOfWeek dayOfWeek;
 
-    private LocalTime open_time;
+    private LocalTime openTime;
 
-    private LocalTime close_time;
+    private LocalTime closeTime;
 
-    private boolean is_closed;
+    private boolean isClosed;
 }

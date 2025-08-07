@@ -16,22 +16,25 @@ public class Market {
     private Long id;
 
     @Column(nullable = false)
-    private String name_en;
+    private String nameKo;
 
     @Column(nullable = false)
-    private String name_ja;
+    private String nameEn;
 
     @Column(nullable = false)
-    private String name_zh;
+    private String nameJa;
 
     @Column(nullable = false)
-    private String address_en;
+    private String nameZh;
 
     @Column(nullable = false)
-    private String address_ja;
+    private String addressEn;
 
     @Column(nullable = false)
-    private String address_zh;
+    private String addressJa;
+
+    @Column(nullable = false)
+    private String addressZh;
 
     @Column(nullable = false)
     private String phone;
@@ -46,12 +49,12 @@ public class Market {
     private String image;
 
     @Column(nullable = false, length = 3000)
-    private String desc_en;
+    private String descEn;
 
     @Column(nullable = false, length = 3000)
-    private String desc_ja;
+    private String descJa;
 
     @Column(nullable = false, length = 3000)
-    private String desc_zh;
+    private String descZh;
 
 }

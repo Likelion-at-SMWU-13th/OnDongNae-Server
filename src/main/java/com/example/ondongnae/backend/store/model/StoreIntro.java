@@ -26,8 +26,8 @@ public class StoreIntro {
     private String tagline;
 
     @Column(nullable = false, length = 1000)
-    private String short_intro;
+    private String shortIntro;
 
     @Column(nullable = false, length = 3000)
-    private String long_intro;
+    private String longIntro;
 }

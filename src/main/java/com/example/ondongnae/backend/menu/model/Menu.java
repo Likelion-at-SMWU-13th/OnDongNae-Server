@@ -27,18 +27,18 @@ public class Menu {
     private Store store;
 
     @Column(nullable = false)
-    private String name_ko;
+    private String nameKo;
 
     @Column(nullable = false)
-    private String name_en;
+    private String nameEn;
 
     @Column(nullable = false)
-    private String name_zh;
+    private String nameZh;
 
     @Column(nullable = false)
-    private String name_ja;
+    private String nameJa;
 
     @Column(nullable = false)
-    private int price_krw;
+    private int priceKrw;
 
 }

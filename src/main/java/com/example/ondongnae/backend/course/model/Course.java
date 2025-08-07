@@ -17,28 +17,28 @@ public class Course {
     private Long id;
 
     @Column(nullable = false)
-    private String title_ko;
+    private String titleKo;
 
     @Column(nullable = false)
-    private String title_en;
+    private String titleEn;
 
     @Column(nullable = false)
-    private String title_zh;
+    private String titleZh;
 
     @Column(nullable = false)
-    private String title_ja;
+    private String titleJa;
 
     @Column(nullable = false)
-    private String description_ko;
+    private String descriptionKo;
 
     @Column(nullable = false)
-    private String description_en;
+    private String descriptionEn;
 
     @Column(nullable = false)
-    private String description_zh;
+    private String descriptionZh;
 
     @Column(nullable = false)
-    private String description_ja;
+    private String descriptionJa;
 
     @OneToMany(mappedBy = "course")
     private List<CourseStore> courseStores = new ArrayList<>();
