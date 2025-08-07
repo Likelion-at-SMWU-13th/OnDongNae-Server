@@ -3,6 +3,7 @@ package com.example.ondongnae.backend.category.model;
 import com.example.ondongnae.backend.store.model.Store;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -10,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class StoreSubCategory {
 
     @Id

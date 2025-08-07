@@ -2,13 +2,12 @@ package com.example.ondongnae.backend.member.controller;
 
 import com.example.ondongnae.backend.global.response.CustomResponse;
 import com.example.ondongnae.backend.member.dto.SignUpDto;
+import com.example.ondongnae.backend.member.dto.RegisterStoreDto;
 import com.example.ondongnae.backend.member.service.AuthService;
+import com.example.ondongnae.backend.store.dto.DescriptionResponseDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.util.Map;
@@ -64,5 +63,16 @@ public class AuthController {
         }
         else return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(CustomResponse.unauthorized("잘못된 아이디 또는 비밀번호입니다."));
+    }
+
+    @PostMapping("/signup/store")
+    public ResponseEntity<CustomResponse<?>> registerStore(@Valid @ModelAttribute RegisterStoreDto registerStoreDto) {
+        Long id = authService.addStore(registerStoreDto);
+        if (id == -1L) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(CustomResponse.serverError("위도/경도 변환에 실패했습니다."));
+        }
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CustomResponse.created("가게가 등록되었습니다", id));
     }
 }

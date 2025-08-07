@@ -42,6 +42,9 @@ public class Store {
     private MainCategory mainCategory;
 
     @OneToMany(mappedBy = "store")
+    private List<StoreIntro> storeIntros = new ArrayList<>();
+
+    @OneToMany(mappedBy = "store")
     private List<StoreImage> storeImages = new ArrayList<>();
 
     @OneToMany(mappedBy = "store")
