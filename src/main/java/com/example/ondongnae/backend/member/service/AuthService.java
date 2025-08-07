@@ -68,8 +68,4 @@ public class AuthService {
         else { return true; }
     }
 
-    public Long addStore(RegisterStoreDto registerStoreDto) {
-        Long id = storeService.registerStore(registerStoreDto);
-        return id;
-    }
 }
