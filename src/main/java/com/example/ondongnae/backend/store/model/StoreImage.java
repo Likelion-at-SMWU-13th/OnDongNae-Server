@@ -22,6 +22,6 @@ public class StoreImage {
     @Column(nullable = false)
     private String url;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name="image_order")
     private int order;
 }
