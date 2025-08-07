@@ -81,6 +81,9 @@ public class AuthController {
         } else if (id == -2L) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(CustomResponse.serverError("AI로부터 응답을 받아오지 못했습니다."));
+        } else if (id == -3L) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(CustomResponse.serverError("이미지 등록에 실패했습니다."));
         }
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CustomResponse.created("가게가 등록되었습니다", id));

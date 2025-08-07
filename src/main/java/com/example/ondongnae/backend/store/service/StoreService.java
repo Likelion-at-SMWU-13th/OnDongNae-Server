@@ -8,6 +8,7 @@ import com.example.ondongnae.backend.category.repository.StoreSubCategoryReposit
 import com.example.ondongnae.backend.category.repository.SubCategoryRepository;
 import com.example.ondongnae.backend.global.dto.LatLngResponseDto;
 import com.example.ondongnae.backend.global.dto.TranslateResponseDto;
+import com.example.ondongnae.backend.global.service.FileService;
 import com.example.ondongnae.backend.global.service.MapService;
 import com.example.ondongnae.backend.global.service.TranslateService;
 import com.example.ondongnae.backend.market.model.Market;
@@ -18,10 +19,12 @@ import com.example.ondongnae.backend.member.repository.MemberRepository;
 import com.example.ondongnae.backend.store.dto.DescriptionCreateRequestDto;
 import com.example.ondongnae.backend.store.dto.DescriptionResponseDto;
 import com.example.ondongnae.backend.store.model.Store;
+import com.example.ondongnae.backend.store.model.StoreImage;
 import com.example.ondongnae.backend.store.model.StoreIntro;
 import com.example.ondongnae.backend.store.repository.StoreImageRepository;
 import com.example.ondongnae.backend.store.repository.StoreIntroRepository;
 import com.example.ondongnae.backend.store.repository.StoreRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,10 +32,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class StoreService {
 
     private final StoreSubCategoryRepository storeSubCategoryRepository;
@@ -48,19 +53,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final StoreImageRepository storeImageRepository;
     private final StoreIntroRepository storeIntroRepository;
-    
-    public StoreService(MemberRepository memberRepository, MarketRepository marketRepository, MainCategoryRepository mainCategoryRepository, SubCategoryRepository subCategoryRepository, TranslateService translateService, MapService mapService, StoreRepository storeRepository, StoreImageRepository storeImageRepository, StoreIntroRepository storeIntroRepository, StoreSubCategoryRepository storeSubCategoryRepository) {
-        this.memberRepository = memberRepository;
-        this.marketRepository = marketRepository;
-        this.mainCategoryRepository = mainCategoryRepository;
-        this.SubCategoryRepository = subCategoryRepository;
-        this.translateService = translateService;
-        this.mapService = mapService;
-        this.storeRepository = storeRepository;
-        this.storeImageRepository = storeImageRepository;
-        this.storeIntroRepository = storeIntroRepository;
-        this.storeSubCategoryRepository = storeSubCategoryRepository;
-    }
+    private final FileService fileService;
 
     public Long registerStore(RegisterStoreDto registerStoreDto) {
 
@@ -105,7 +98,16 @@ public class StoreService {
         saveStoreIntro(descriptionResponseDto, savedStore);
 
         // 가게 이미지 저장
-
+        int order = 1;
+        for (MultipartFile file : registerStoreDto.getImage()) {
+            String imageUrl = fileService.uploadFile(file);
+            if (imageUrl == null) {
+                return -3L;
+            }
+            StoreImage storeImage = StoreImage.builder().store(savedStore)
+                    .url(imageUrl).order(order++).build();
+            storeImageRepository.save(storeImage);
+        }
         return savedStore.getId();
     }
 
