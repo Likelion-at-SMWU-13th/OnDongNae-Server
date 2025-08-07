@@ -43,6 +43,8 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	implementation group: 'com.google.maps', name: 'google-maps-services', version: '2.2.0'
 }
 
 tasks.named('test') {
