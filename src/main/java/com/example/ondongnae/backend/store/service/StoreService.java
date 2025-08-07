@@ -67,7 +67,8 @@ public class StoreService {
         // 설명 생성
         DescriptionCreateRequestDto descriptionCreateRequestDto = createDescriptionCreateRequestDto(registerStoreDto);
         DescriptionResponseDto descriptionResponseDto = generateDescription(descriptionCreateRequestDto);
-
+        if (descriptionResponseDto == null)
+            return -2L;
 
         String storeName = registerStoreDto.getStoreName();
         Member member = memberRepository.findById(registerStoreDto.getUserId())
@@ -129,7 +130,7 @@ public class StoreService {
     private void saveStoreCategories(List<Long> subCategoryIds, Store savedStore) {
         for (Long id : subCategoryIds) {
             SubCategory subCategory = SubCategoryRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 id의 대분류가 존재하지 않습니다."));
+                    .orElseThrow(() -> new IllegalArgumentException("해당 id의 소분류가 존재하지 않습니다."));
             StoreSubCategory storeSubCategory = StoreSubCategory.builder().subCategory(subCategory).store(savedStore).build();
             storeSubCategoryRepository.save(storeSubCategory);
         }
@@ -151,7 +152,7 @@ public class StoreService {
 
         for (Long id : registerStoreDto.getSubCategory()) {
             SubCategory subCategory = SubCategoryRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 id의 대분류가 존재하지 않습니다."));
+                    .orElseThrow(() -> new IllegalArgumentException("해당 id의 소분류가 존재하지 않습니다."));
             subCategories.add(subCategory.getNameKo());
         }
 
@@ -173,8 +174,13 @@ public class StoreService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<DescriptionCreateRequestDto> requestEntity = new HttpEntity<>(descriptionCreateRequestDto, headers);
 
-        DescriptionResponseDto aiResponse = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, DescriptionResponseDto.class).getBody();
+        DescriptionResponseDto aiResponse;
 
+        try {
+            aiResponse = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, DescriptionResponseDto.class).getBody();
+        } catch (Exception e) {
+            return null;
+        }
         return aiResponse;
     }
 }
