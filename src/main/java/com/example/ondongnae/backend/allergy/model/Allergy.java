@@ -20,16 +20,16 @@ public class Allergy {
     private Long id;
 
     @Column(nullable = false)
-    private String label_ko;
+    private String labelKo;
 
     @Column(nullable = false)
-    private String label_en;
+    private String labelEn;
 
     @Column(nullable = false)
-    private String label_ja;
+    private String labelJa;
 
     @Column(nullable = false)
-    private String label_zh;
+    private String labelZh;
 
     @OneToMany(mappedBy = "allergy")
     private List<MenuAllergy> menuAllergies = new ArrayList<>();

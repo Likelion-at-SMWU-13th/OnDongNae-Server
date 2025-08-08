@@ -58,6 +58,11 @@ public class CustomResponse<T> {
         return new CustomResponse<T>(HttpStatus.FORBIDDEN, "권한이 없습니다.", false);
     }
 
+    // 422 UNPROCESSABLE_ENTITY
+    public static <T> CustomResponse<T>  unprocessableEntity(String message) {
+        return new CustomResponse<T>(HttpStatus.UNPROCESSABLE_ENTITY, message, false);
+    }
+
     // 500 INTERNAL_SERVER_ERROR
     public static <T> CustomResponse<T>  serverError(String message) {
         return new CustomResponse<T>(HttpStatus.INTERNAL_SERVER_ERROR, message, false);

@@ -16,6 +16,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Store {
 
     @Id
@@ -41,34 +42,37 @@ public class Store {
     private MainCategory mainCategory;
 
     @OneToMany(mappedBy = "store")
+    private List<StoreIntro> storeIntros = new ArrayList<>();
+
+    @OneToMany(mappedBy = "store")
     private List<StoreImage> storeImages = new ArrayList<>();
 
     @OneToMany(mappedBy = "store")
     private List<StoreSubCategory> storeSubCategories = new ArrayList<>();
 
     @Column(nullable = false)
-    private String name_ko;
+    private String nameKo;
 
     @Column(nullable = false)
-    private String name_en;
+    private String nameEn;
 
     @Column(nullable = false)
-    private String name_ja;
+    private String nameJa;
 
     @Column(nullable = false)
-    private String name_zh;
+    private String nameZh;
 
     @Column(nullable = false)
-    private String address_ko;
+    private String addressKo;
 
     @Column(nullable = false)
-    private String address_en;
+    private String addressEn;
 
     @Column(nullable = false)
-    private String address_ja;
+    private String addressJa;
 
     @Column(nullable = false)
-    private String address_zh;
+    private String addressZh;
 
     private String phone;
 

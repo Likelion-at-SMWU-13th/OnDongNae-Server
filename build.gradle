@@ -37,12 +37,16 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	implementation 'com.mysql:mysql-connector-j'
-
+	// JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
-
+	// @Valid
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	// Google Map (위도/경도 변환)
+	implementation group: 'com.google.maps', name: 'google-maps-services', version: '2.2.0'
+	// AWS
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
 
 tasks.named('test') {

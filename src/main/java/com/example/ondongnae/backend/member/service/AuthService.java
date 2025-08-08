@@ -1,10 +1,13 @@
 package com.example.ondongnae.backend.member.service;
 
 import com.example.ondongnae.backend.global.config.security.JwtProvider;
+import com.example.ondongnae.backend.member.dto.RegisterStoreDto;
 import com.example.ondongnae.backend.member.dto.SignUpDto;
 import com.example.ondongnae.backend.member.dto.TokenDto;
 import com.example.ondongnae.backend.member.model.Member;
 import com.example.ondongnae.backend.member.repository.MemberRepository;
+import com.example.ondongnae.backend.store.dto.DescriptionResponseDto;
+import com.example.ondongnae.backend.store.service.StoreService;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,10 +15,12 @@ public class AuthService {
 
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
+    private final StoreService storeService;
 
-    public AuthService(MemberRepository memberRepository, JwtProvider jwtProvider) {
+    public AuthService(MemberRepository memberRepository, JwtProvider jwtProvider, StoreService storeService) {
         this.memberRepository = memberRepository;
         this.jwtProvider = jwtProvider;
+        this.storeService = storeService;
     }
     
     public long addUser(SignUpDto signUpDto) {
@@ -62,4 +67,5 @@ public class AuthService {
         if (!member.getPassword().equals(password)) { return false; }
         else { return true; }
     }
+
 }
