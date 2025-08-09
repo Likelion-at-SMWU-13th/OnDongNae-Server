@@ -1,6 +1,8 @@
 package com.example.ondongnae.backend.member.service;
 
 import com.example.ondongnae.backend.global.config.security.JwtProvider;
+import com.example.ondongnae.backend.global.exception.BaseException;
+import com.example.ondongnae.backend.global.exception.ErrorCode;
 import com.example.ondongnae.backend.member.dto.RegisterStoreDto;
 import com.example.ondongnae.backend.member.dto.SignUpDto;
 import com.example.ondongnae.backend.member.dto.TokenDto;
@@ -9,6 +11,9 @@ import com.example.ondongnae.backend.member.repository.MemberRepository;
 import com.example.ondongnae.backend.store.dto.DescriptionResponseDto;
 import com.example.ondongnae.backend.store.service.StoreService;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 public class AuthService {
@@ -23,26 +28,26 @@ public class AuthService {
         this.storeService = storeService;
     }
     
-    public long addUser(SignUpDto signUpDto) {
+    public Map<String, Object> addUser(SignUpDto signUpDto) {
         String password1 = signUpDto.getPassword1();
         String password2 = signUpDto.getPassword2();
         String phoneNum = signUpDto.getPhoneNum();
         String loginId = signUpDto.getLoginId();
 
         if (!password1.equals(password2)) {
-            return -1;
+            throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "비밀번호가 일치하지 않습니다");
         }
 
         if (!phoneNum.matches("^010-\\d{4}-\\d{4}$")) {
-            return -2;
+            throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "잘못된 전화번호 포맷입니다.");
         }
 
         if (memberRepository.existsByPhone(phoneNum)) {
-            return -3;
+            throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "이미 가입된 전화번호입니다.");
         }
 
         if (memberRepository.existsByLoginId(loginId)) {
-            return -4;
+            throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "이미 존재하는 아이디입니다.");
         }
 
         Member member = Member.builder()
@@ -56,16 +61,21 @@ public class AuthService {
 
         TokenDto tokens = jwtProvider.createTokens(savedMember.getId());
 
-        return savedMember.getId();
+        Map<String, Object> data = new HashMap<>();
+        data.put("memberId", savedMember.getId());
+        data.put("tokens", tokens);
+        return data;
     }
 
-    public boolean login(String id, String password) {
-        System.out.println(id + password);
+    public TokenDto login(String id, String password) {
         Member member = memberRepository.findByLoginId(id);
-        System.out.println(member);
-        if (member == null) { return false; }
-        if (!member.getPassword().equals(password)) { return false; }
-        else { return true; }
+
+        if (member == null || !member.getPassword().equals(password))
+            throw new BaseException(ErrorCode.UNAUTHORIZED, "잘못된 아이디 또는 비밀번호입니다");
+        else {
+            TokenDto tokens = jwtProvider.createTokens(member.getId());
+            return tokens;
+        }
     }
 
 }

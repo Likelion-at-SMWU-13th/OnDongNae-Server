@@ -5,6 +5,8 @@ import com.example.ondongnae.backend.category.model.MainCategory;
 import com.example.ondongnae.backend.category.model.SubCategory;
 import com.example.ondongnae.backend.category.repository.MainCategoryRepository;
 import com.example.ondongnae.backend.category.repository.SubCategoryRepository;
+import com.example.ondongnae.backend.global.exception.BaseException;
+import com.example.ondongnae.backend.global.exception.ErrorCode;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -36,7 +38,7 @@ public class CategoryService {
     public List<SignUpCategoryDto> getSubCategories(Long id) {
         // 대분류에 해당하는 소분류 조회
         MainCategory mainCategory = mainCategoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("해당 id의 대분류가 존재하지 않습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.CATEGORY_NOT_FOUND, "해당 id의 대분류가 존재하지 않습니다."));
         List<SubCategory> byMainCategory = subCategoryRepository.findByMainCategory(mainCategory);
 
         List<SignUpCategoryDto> subCategories = new ArrayList<>();
