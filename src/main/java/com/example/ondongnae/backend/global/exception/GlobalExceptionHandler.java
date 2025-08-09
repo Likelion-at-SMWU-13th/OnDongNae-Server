@@ -1,8 +1,6 @@
 package com.example.ondongnae.backend.global.exception;
 
 import com.example.ondongnae.backend.global.response.ApiResponse;
-import com.example.ondongnae.backend.global.response.CustomResponse;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,9 +13,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<ApiResponse<?>> handleBaseException(BaseException e) {
         ErrorCode errorCode = e.getErrorCode();
+        String errorMessage = e.getMessage();
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(ApiResponse.error(errorCode));
+                .body(ApiResponse.error(errorCode, errorMessage));
     }
 
     // 유효성 검증 실패
@@ -25,7 +24,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<?>> handleValidationException(MethodArgumentNotValidException e) {
         return ResponseEntity
                 .status(ErrorCode.INVALID_INPUT_VALUE.getStatus())
-                .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE, e.getBindingResult().toString()));
+                .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE, "필수 입력 항목이 누락되었습니다."));
     }
 
     // 예상 못한 예외
