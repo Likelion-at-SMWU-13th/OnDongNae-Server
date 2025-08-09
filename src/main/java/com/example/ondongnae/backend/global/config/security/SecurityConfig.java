@@ -1,6 +1,7 @@
 package com.example.ondongnae.backend.global.config.security;
 
-import com.example.ondongnae.backend.global.response.CustomResponse;
+import com.example.ondongnae.backend.global.exception.ErrorCode;
+import com.example.ondongnae.backend.global.response.ApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,12 +34,14 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             String exceptionMessage = (String) request.getAttribute("exceptionMessage");
-                            if (exceptionMessage == null) exceptionMessage = "Unauthorized";
+                            if (exceptionMessage == null) exceptionMessage = authException.getMessage();
+                            ErrorCode exceptionCode = (ErrorCode) request.getAttribute("exceptionCode");
+                            if (exceptionCode == null) exceptionCode = ErrorCode.INVALID_TOKEN;
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json;charset=UTF-8");
 
                             ObjectMapper objectMapper = new ObjectMapper();
-                            response.getWriter().write(objectMapper.writeValueAsString(CustomResponse.unauthorized(exceptionMessage)));
+                            response.getWriter().write(objectMapper.writeValueAsString(ApiResponse.error(exceptionCode, exceptionMessage)));
                         }));
         return http.build();
     }
