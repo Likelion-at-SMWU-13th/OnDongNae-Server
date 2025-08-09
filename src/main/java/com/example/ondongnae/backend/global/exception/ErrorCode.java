@@ -24,9 +24,9 @@ public enum ErrorCode {
 
     // 메뉴 관련
 
-    // 영업 시간 관련
-
     // 가게 관련
+    STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_NOT_FOUND", "해당 가게를 찾을 수 없습니다"),
+    BUSINESS_HOUR_NOT_FOUND(HttpStatus.NOT_FOUND, "BUSINESS_HOUR_NOT_FOUND", "영업시간 정보를 찾을 수 없습니다"),
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "CATEGORY_NOT_FOUND", "해당 분류를 찾을 수 없습니다."),
 
     // 유저 관련
