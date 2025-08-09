@@ -18,6 +18,8 @@ import com.example.ondongnae.backend.market.repository.MarketRepository;
 import com.example.ondongnae.backend.member.dto.RegisterStoreDto;
 import com.example.ondongnae.backend.member.model.Member;
 import com.example.ondongnae.backend.member.repository.MemberRepository;
+import com.example.ondongnae.backend.store.dto.AddStoreRequestDto;
+import com.example.ondongnae.backend.store.dto.AddStoreResponseDto;
 import com.example.ondongnae.backend.store.dto.DescriptionCreateRequestDto;
 import com.example.ondongnae.backend.store.dto.DescriptionResponseDto;
 import com.example.ondongnae.backend.store.model.Store;
@@ -46,6 +48,8 @@ public class StoreService {
     private final StoreSubCategoryRepository storeSubCategoryRepository;
     @Value("${DESC_API_URL}")
     private String API_URL;
+    @Value("${ADD_STORE_API_URL}")
+    private String ADD_STORE_API_URL;
     
     private final MemberRepository memberRepository;
     private final MarketRepository marketRepository;
@@ -109,7 +113,40 @@ public class StoreService {
                     .url(imageUrl).order(order++).build();
             storeImageRepository.save(storeImage);
         }
+
+        // 벡터 DB에 가게 정보 임베딩
+        embedStore(descriptionCreateRequestDto, descriptionResponseDto, market.getNameKo());
+
         return savedStore.getId();
+    }
+
+    private void embedStore(DescriptionCreateRequestDto data, DescriptionResponseDto description, String marketName) {
+
+        AddStoreRequestDto addStoreRequestDto = AddStoreRequestDto.builder().name(data.getName()).description(description.getLong_description())
+                .main_category(data.getMainCategory()).sub_category(data.getSubCategory())
+                .address(data.getAddress()).market(marketName).build();
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<AddStoreRequestDto> requestEntity = new HttpEntity<>(addStoreRequestDto, headers);
+
+        AddStoreResponseDto addStoreResponseDto;
+
+        try {
+            addStoreResponseDto = restTemplate.exchange(ADD_STORE_API_URL, HttpMethod.POST, requestEntity, AddStoreResponseDto.class).getBody();
+
+            if (addStoreResponseDto == null)
+                throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "외부 API로부터 응답을 받아오지 못했습니다.");
+
+        } catch (ResourceAccessException e) {
+            throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "외부 API 연결에 실패했습니다.");
+        } catch (Exception e) {
+            throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "외부 API 호출 중 알 수 없는 오류가 발생했습니다.");
+        }
+
+        System.out.println((addStoreResponseDto.getCount()));
     }
 
     private void saveStoreIntro(DescriptionResponseDto descriptionResponseDto, Store store) {
