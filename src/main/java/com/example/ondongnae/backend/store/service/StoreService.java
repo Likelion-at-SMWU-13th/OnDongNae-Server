@@ -8,6 +8,8 @@ import com.example.ondongnae.backend.category.repository.StoreSubCategoryReposit
 import com.example.ondongnae.backend.category.repository.SubCategoryRepository;
 import com.example.ondongnae.backend.global.dto.LatLngResponseDto;
 import com.example.ondongnae.backend.global.dto.TranslateResponseDto;
+import com.example.ondongnae.backend.global.exception.BaseException;
+import com.example.ondongnae.backend.global.exception.ErrorCode;
 import com.example.ondongnae.backend.global.service.FileService;
 import com.example.ondongnae.backend.global.service.MapService;
 import com.example.ondongnae.backend.global.service.TranslateService;
@@ -31,6 +33,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -60,16 +63,14 @@ public class StoreService {
         // 설명 생성
         DescriptionCreateRequestDto descriptionCreateRequestDto = createDescriptionCreateRequestDto(registerStoreDto);
         DescriptionResponseDto descriptionResponseDto = generateDescription(descriptionCreateRequestDto);
-        if (descriptionResponseDto == null)
-            return -2L;
 
         String storeName = registerStoreDto.getStoreName();
         Member member = memberRepository.findById(registerStoreDto.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("해당 id의 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.USER_NOT_FOUND, "해당 id의 유저가 존재하지 않습니다."));
         Market market = marketRepository.findByNameKo(registerStoreDto.getMarketName())
-                .orElseThrow(() -> new IllegalArgumentException("해당 이름의 시장이 존재하지 않습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.MARKET_NOT_FOUND, "해당 이름의 시장이 존재하지 않습니다."));
         MainCategory mainCategory = mainCategoryRepository.findById(registerStoreDto.getMainCategory())
-                .orElseThrow(() -> new IllegalArgumentException("해당 id의 대분류가 존재하지 않습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.CATEGORY_NOT_FOUND, "해당 id의 대분류가 존재하지 않습니다."));
 
         // 가게 이름 번역
         TranslateResponseDto translateName = translateService.translate(storeName);
@@ -78,7 +79,7 @@ public class StoreService {
         // 위도 경도 변환
         LatLngResponseDto latLngByAddress = mapService.getLatLngByAddress(registerStoreDto.getAddress());
         if (latLngByAddress == null) {
-            return -1L;
+            throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "외부 API로부터 위도, 경도를 불러오지 못했습니다.");
         }
 
         // 가게 저장
@@ -102,7 +103,7 @@ public class StoreService {
         for (MultipartFile file : registerStoreDto.getImage()) {
             String imageUrl = fileService.uploadFile(file);
             if (imageUrl == null) {
-                return -3L;
+                throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "이미지 등록에 실패했습니다.");
             }
             StoreImage storeImage = StoreImage.builder().store(savedStore)
                     .url(imageUrl).order(order++).build();
@@ -132,7 +133,7 @@ public class StoreService {
     private void saveStoreCategories(List<Long> subCategoryIds, Store savedStore) {
         for (Long id : subCategoryIds) {
             SubCategory subCategory = SubCategoryRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 id의 소분류가 존재하지 않습니다."));
+                    .orElseThrow(() -> new BaseException(ErrorCode.CATEGORY_NOT_FOUND, "해당 id의 소분류가 존재하지 않습니다."));
             StoreSubCategory storeSubCategory = StoreSubCategory.builder().subCategory(subCategory).store(savedStore).build();
             storeSubCategoryRepository.save(storeSubCategory);
         }
@@ -150,11 +151,11 @@ public class StoreService {
             registerStoreDto.setStrength("");
 
         MainCategory mainCategory = mainCategoryRepository.findById(registerStoreDto.getMainCategory())
-                .orElseThrow(() -> new IllegalArgumentException("해당 id의 대분류가 존재하지 않습니다."));
+                .orElseThrow(() -> new BaseException(ErrorCode.CATEGORY_NOT_FOUND, "해당 id의 대분류가 존재하지 않습니다."));
 
         for (Long id : registerStoreDto.getSubCategory()) {
             SubCategory subCategory = SubCategoryRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 id의 소분류가 존재하지 않습니다."));
+                    .orElseThrow(() -> new BaseException(ErrorCode.CATEGORY_NOT_FOUND,"해당 id의 소분류가 존재하지 않습니다."));
             subCategories.add(subCategory.getNameKo());
         }
 
@@ -180,9 +181,17 @@ public class StoreService {
 
         try {
             aiResponse = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, DescriptionResponseDto.class).getBody();
+
+            if (aiResponse == null)
+                throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "외부 API로부터 응답을 받아오지 못했습니다.");
+
+            return aiResponse;
+
+        } catch (ResourceAccessException e) {
+            throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "외부 API 연결에 실패했습니다.");
         } catch (Exception e) {
-            return null;
+            throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "외부 API 호출 중 알 수 없는 오류가 발생했습니다.");
         }
-        return aiResponse;
+
     }
 }
