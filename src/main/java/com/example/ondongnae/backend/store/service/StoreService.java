@@ -115,15 +115,15 @@ public class StoreService {
         }
 
         // 벡터 DB에 가게 정보 임베딩
-        embedStore(descriptionCreateRequestDto, descriptionResponseDto, market.getNameKo());
+        embedStore(descriptionCreateRequestDto, descriptionResponseDto, market.getNameKo(), savedStore.getId());
 
         return savedStore.getId();
     }
 
-    private void embedStore(DescriptionCreateRequestDto data, DescriptionResponseDto description, String marketName) {
+    private void embedStore(DescriptionCreateRequestDto data, DescriptionResponseDto description, String marketName, Long storeId) {
 
         AddStoreRequestDto addStoreRequestDto = AddStoreRequestDto.builder().name(data.getName()).description(description.getLong_description())
-                .main_category(data.getMainCategory()).sub_category(data.getSubCategory())
+                .main_category(data.getMainCategory()).sub_category(data.getSubCategory()).id(storeId.intValue())
                 .address(data.getAddress()).market(marketName).build();
 
         RestTemplate restTemplate = new RestTemplate();
