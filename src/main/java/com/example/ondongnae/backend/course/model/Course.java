@@ -29,16 +29,16 @@ public class Course {
     @Column(nullable = false)
     private String titleJa;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String longDescriptionKo;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String longDescriptionEn;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String longDescriptionZh;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String longDescriptionJa;
 
     @Column(nullable = false)

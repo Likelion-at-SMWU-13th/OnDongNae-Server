@@ -20,7 +20,7 @@ public enum ErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"EXPIRED_TOKEN","만료된 토큰입니다."),
 
     // 외부 API 관련
-    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "EXTERNAL_API_ERROR", "외부 API 연결에 실패했거나 응답이 유효하지 않습니다."),
+    EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EXTERNAL_API_ERROR", "외부 API 연결에 실패했거나 응답이 유효하지 않습니다."),
 
     // 메뉴 관련
 
@@ -38,7 +38,7 @@ public enum ErrorCode {
     // 지도 관련
 
     // 코스 추천 관련
-
+    OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "OPTION_NOT_FOUND", "해당 옵션을 찾을 수 없습니다."),
     // 환율 관련
 
     // 최종 안전망

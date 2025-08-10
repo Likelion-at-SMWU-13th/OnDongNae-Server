@@ -9,6 +9,6 @@ public class RecommendedCourseStoreDto {
 
     private String name;
     private String longDescription;
-    private int order;
+    private long order;
 
 }
