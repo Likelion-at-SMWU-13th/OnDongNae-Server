@@ -85,15 +85,12 @@ public class CourseService {
             long order = s.getOrder();
 
             StoreIntro storeIntro = storeIntroRepository.findFirstByStoreIdAndLang(store.getId(), language).orElse(null);
-            String longIntro;
-            try {
-                longIntro = storeIntro.getLongIntro();
-            } catch (NullPointerException e) {
-                longIntro = null;
-            }
+            String longIntro = storeIntro.getLongIntro();
+            String shortIntro = storeIntro.getShortIntro();
+
 
             RecommendedCourseStoreDto dto = RecommendedCourseStoreDto.builder().name(storeName)
-                    .longDescription(longIntro).order(order).build();
+                    .longDescription(longIntro).shortDescription(shortIntro).order(order).build();
             recommendedCourseStoreDtoList.add(dto);
         }
 
