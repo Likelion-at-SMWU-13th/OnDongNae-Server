@@ -10,6 +10,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Course {
 
     @Id
@@ -28,17 +29,29 @@ public class Course {
     @Column(nullable = false)
     private String titleJa;
 
-    @Column(nullable = false)
-    private String descriptionKo;
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    private String longDescriptionKo;
+
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    private String longDescriptionEn;
+
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    private String longDescriptionZh;
+
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    private String longDescriptionJa;
 
     @Column(nullable = false)
-    private String descriptionEn;
+    private String shortDescriptionKo;
 
     @Column(nullable = false)
-    private String descriptionZh;
+    private String shortDescriptionEn;
 
     @Column(nullable = false)
-    private String descriptionJa;
+    private String shortDescriptionZh;
+
+    @Column(nullable = false)
+    private String shortDescriptionJa;
 
     @OneToMany(mappedBy = "course")
     private List<CourseStore> courseStores = new ArrayList<>();
