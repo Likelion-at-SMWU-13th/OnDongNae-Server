@@ -1,9 +1,6 @@
 package com.example.ondongnae.backend.course.controller;
 
-import com.example.ondongnae.backend.course.dto.CourseDetailDto;
-import com.example.ondongnae.backend.course.dto.CourseRecommendResponseDto;
-import com.example.ondongnae.backend.course.dto.OptionAndMarketRequestDto;
-import com.example.ondongnae.backend.course.dto.SelectedOptionDto;
+import com.example.ondongnae.backend.course.dto.*;
 import com.example.ondongnae.backend.course.service.CourseRecommendationService;
 import com.example.ondongnae.backend.course.service.CourseService;
 import com.example.ondongnae.backend.course.service.OptionService;
@@ -29,8 +26,16 @@ public class CourseController {
     private final CourseRecommendationService courseRecommendationService;
     private final CourseService courseService;
 
+    @GetMapping
+    public ResponseEntity<ApiResponse<?>> getRandomCourses(@CookieValue(name="language", required = false) String language) {
+        List<RandomCourseDto> randomCourses = courseService.getRandomCourses(language);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.ok(randomCourses));
+    }
+
+
     @GetMapping("/{courseId}")
-    public ResponseEntity<ApiResponse<?>> getRandomCourses(@CookieValue(name="language", required = false) String language,
+    public ResponseEntity<ApiResponse<?>> getCourseDetail(@CookieValue(name="language", required = false) String language,
                                                            @PathVariable Long courseId) {
         CourseDetailDto courseDetail = courseService.getCourseDetail(courseId, language);
         return ResponseEntity.status(HttpStatus.OK)
