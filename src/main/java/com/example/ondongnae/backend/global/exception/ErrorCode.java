@@ -39,6 +39,8 @@ public enum ErrorCode {
 
     // 코스 추천 관련
     OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "OPTION_NOT_FOUND", "해당 옵션을 찾을 수 없습니다."),
+    COURSE_NOT_FOUND(HttpStatus.NOT_FOUND, "COURSE_NOT_FOUND", "해당 코스를 찾을 수 없습니다."),
+
     // 환율 관련
 
     // 최종 안전망

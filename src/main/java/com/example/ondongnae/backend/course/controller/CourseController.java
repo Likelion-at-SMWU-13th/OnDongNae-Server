@@ -1,8 +1,10 @@
 package com.example.ondongnae.backend.course.controller;
 
+import com.example.ondongnae.backend.course.dto.CourseDetailDto;
 import com.example.ondongnae.backend.course.dto.CourseRecommendResponseDto;
 import com.example.ondongnae.backend.course.dto.OptionAndMarketRequestDto;
 import com.example.ondongnae.backend.course.dto.SelectedOptionDto;
+import com.example.ondongnae.backend.course.service.CourseRecommendationService;
 import com.example.ondongnae.backend.course.service.CourseService;
 import com.example.ondongnae.backend.course.service.OptionService;
 import com.example.ondongnae.backend.global.response.ApiResponse;
@@ -24,7 +26,16 @@ public class CourseController {
 
     private final OptionService optionService;
     private final MarketService marketService;
+    private final CourseRecommendationService courseRecommendationService;
     private final CourseService courseService;
+
+    @GetMapping("/{courseId}")
+    public ResponseEntity<ApiResponse<?>> getRandomCourses(@CookieValue(name="language", required = false) String language,
+                                                           @PathVariable Long courseId) {
+        CourseDetailDto courseDetail = courseService.getCourseDetail(courseId, language);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.ok(courseDetail));
+    }
 
     @GetMapping("/options")
     public ResponseEntity<ApiResponse<?>> getOptions(@CookieValue(name="language", required = false) String language) {
@@ -41,7 +52,7 @@ public class CourseController {
     public ResponseEntity<ApiResponse<?>> courseRecommendation(@CookieValue(name="language", required = false) String language,
                                                            @Valid @RequestBody SelectedOptionDto selectedOptionDto) {
         System.out.println("lang" + language);
-        CourseRecommendResponseDto courseRecommendation = courseService.getCourseRecommendationByAI(selectedOptionDto, language);
+        CourseRecommendResponseDto courseRecommendation = courseRecommendationService.getCourseRecommendationByAI(selectedOptionDto, language);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.ok(courseRecommendation));
 
