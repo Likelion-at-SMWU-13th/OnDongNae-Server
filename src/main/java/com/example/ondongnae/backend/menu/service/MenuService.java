@@ -6,6 +6,7 @@ import com.example.ondongnae.backend.global.service.TranslateService;
 import com.example.ondongnae.backend.member.service.AuthService;
 import com.example.ondongnae.backend.menu.dto.ManualMenuCreateRequest;
 import com.example.ondongnae.backend.menu.dto.ManualMenuCreateResponse;
+import com.example.ondongnae.backend.menu.dto.MenuInfo;
 import com.example.ondongnae.backend.menu.model.Menu;
 import com.example.ondongnae.backend.menu.repository.MenuRepository;
 import com.example.ondongnae.backend.store.model.Store;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final TranslateService translateService;
 
+    // 수기 메뉴 등록
     @Transactional
     public ManualMenuCreateResponse createManual(ManualMenuCreateRequest request) {
         // 1. 토큰 -> 내 가게 ID 추출
@@ -58,4 +61,29 @@ public class MenuService {
     }
 
     private String nvl(String v, String fb) { return (v == null || v.isBlank()) ? fb : v; }
+
+    // 메뉴 목록 조회
+    @Transactional(readOnly = true)
+    public List<MenuInfo> getMenus() {
+        Long storeId = authService.getMyStoreId();
+
+        List<Menu> menus = menuRepository.findWithAllergiesByStoreId(storeId);
+
+        return menus.stream()
+                .map(m -> MenuInfo.builder()
+                        .menuId(m.getId())
+                        .nameKo(m.getNameKo())
+                        .priceKrw(m.getPriceKrw())
+                        .allergies(
+                                m.getMenuAllergies().stream()
+                                        .map(ma -> ma.getAllergy().getLabelKo())
+                                        .filter(Objects::nonNull)
+                                        .distinct()
+                                        .sorted()
+                                        .toList()
+                        )
+                        .build())
+                .toList();
+    }
+
 }
