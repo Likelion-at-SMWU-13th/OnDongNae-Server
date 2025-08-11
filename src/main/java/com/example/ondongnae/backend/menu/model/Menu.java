@@ -3,6 +3,7 @@ package com.example.ondongnae.backend.menu.model;
 import com.example.ondongnae.backend.store.model.Store;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Menu {
 
     @Id

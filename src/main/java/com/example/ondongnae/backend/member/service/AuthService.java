@@ -9,7 +9,11 @@ import com.example.ondongnae.backend.member.dto.TokenDto;
 import com.example.ondongnae.backend.member.model.Member;
 import com.example.ondongnae.backend.member.repository.MemberRepository;
 import com.example.ondongnae.backend.store.dto.DescriptionResponseDto;
+import com.example.ondongnae.backend.store.model.Store;
+import com.example.ondongnae.backend.store.repository.StoreRepository;
 import com.example.ondongnae.backend.store.service.StoreService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -19,11 +23,13 @@ import java.util.Map;
 public class AuthService {
 
     private final MemberRepository memberRepository;
+    private final StoreRepository storeRepository;
     private final JwtProvider jwtProvider;
     private final StoreService storeService;
 
-    public AuthService(MemberRepository memberRepository, JwtProvider jwtProvider, StoreService storeService) {
+    public AuthService(MemberRepository memberRepository, StoreRepository storeRepository, JwtProvider jwtProvider, StoreService storeService) {
         this.memberRepository = memberRepository;
+        this.storeRepository = storeRepository;
         this.jwtProvider = jwtProvider;
         this.storeService = storeService;
     }
@@ -78,4 +84,22 @@ public class AuthService {
         }
     }
 
+    public Long getMyStoreId() {
+        // 1. SecurityContext에서 인증 정보 가져오기
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // 2. 인증 객체가 없거나 로그인하지 않은 경우 예외 발생
+        if (auth == null || !auth.isAuthenticated() || auth.getPrincipal() == null
+                || "anonymousUser".equals(auth.getPrincipal())) {
+            throw new BaseException(ErrorCode.UNAUTHORIZED);
+        }
+
+        // 3. principal에 담긴 Member 엔티티 가져오기 (JWT 필터에서 세팅)
+        Member member = (Member) auth.getPrincipal();
+
+        // 4. 해당 회원이 가진 Store ID 조회 (없으면 예외)
+        return storeRepository.findByMemberId(member.getId())
+                .map(Store::getId)
+                .orElseThrow(() -> new BaseException(ErrorCode.STORE_NOT_FOUND));
+    }
 }
