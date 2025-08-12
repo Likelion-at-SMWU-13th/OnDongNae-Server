@@ -20,6 +20,9 @@ public class FileService {
     @Value("${AWS_BUCKET}")
     public String bucket;
 
+    @Value("${AWS_REGION}")
+    public String region;
+
     public String uploadFile(MultipartFile file) {
         try {
             String fileName = file.getOriginalFilename();

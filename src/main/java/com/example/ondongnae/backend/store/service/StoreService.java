@@ -104,13 +104,19 @@ public class StoreService {
 
         // 가게 이미지 저장
         int order = 1;
-        for (MultipartFile file : registerStoreDto.getImage()) {
-            String imageUrl = fileService.uploadFile(file);
-            if (imageUrl == null) {
-                throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "이미지 등록에 실패했습니다.");
+        if (registerStoreDto.getImage() != null) {
+            for (MultipartFile file : registerStoreDto.getImage()) {
+                String imageUrl = fileService.uploadFile(file);
+                if (imageUrl == null) {
+                    throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "이미지 등록에 실패했습니다.");
+                }
+                StoreImage storeImage = StoreImage.builder().store(savedStore)
+                        .url(imageUrl).order(order++).build();
+                storeImageRepository.save(storeImage);
             }
+        } else {
             StoreImage storeImage = StoreImage.builder().store(savedStore)
-                    .url(imageUrl).order(order++).build();
+                    .url("https://" + fileService.bucket + ".s3." + fileService.region +".amazonaws.com/defaultImage.png").order(order++).build();
             storeImageRepository.save(storeImage);
         }
 
