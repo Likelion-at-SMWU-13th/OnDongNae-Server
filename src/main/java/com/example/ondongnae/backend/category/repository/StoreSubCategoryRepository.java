@@ -5,7 +5,9 @@ import com.example.ondongnae.backend.store.model.Store;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface StoreSubCategoryRepository extends JpaRepository<StoreSubCategory, Long> {
-    StoreSubCategory store(Store store);
+    List<StoreSubCategory> findByStore(Store store);
 }
