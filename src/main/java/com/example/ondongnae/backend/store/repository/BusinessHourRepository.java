@@ -10,5 +10,6 @@ import java.util.List;
 public interface BusinessHourRepository extends JpaRepository<BusinessHour, Long> {
     // 특정 가게의 주간 영업시간 목록 조회
     List<BusinessHour> findByStoreId(Long storeId);
+    void deleteByStoreId(Long storeId);
 }
 
