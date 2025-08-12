@@ -1,10 +1,9 @@
 package com.example.ondongnae.backend.menu.controller;
 
 import com.example.ondongnae.backend.global.response.ApiResponse;
-import com.example.ondongnae.backend.menu.dto.ManualMenuCreateRequest;
-import com.example.ondongnae.backend.menu.dto.ManualMenuCreateResponse;
-import com.example.ondongnae.backend.menu.dto.MenuInfo;
+import com.example.ondongnae.backend.menu.dto.*;
 import com.example.ondongnae.backend.menu.service.MenuService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +32,15 @@ public class MenuController {
     public ResponseEntity<ApiResponse<List<MenuInfo>>> getAllMenus() {
         List<MenuInfo> list = menuService.getMenus();
         return ResponseEntity.ok(ApiResponse.ok("메뉴 목록 조회 성공", list));
+    }
+
+    // 메뉴 수정
+    @PutMapping
+    public ResponseEntity<ApiResponse<MenuUpdateResponse>> replaceAll(
+            @Valid @RequestBody MenuUpdateRequest request
+    ) {
+        MenuUpdateResponse data = menuService.replaceAll(request);
+        return ResponseEntity.ok(ApiResponse.ok("메뉴 수정 완료", data));
     }
 
 }
