@@ -43,4 +43,12 @@ public class Menu {
     @Column(nullable = false)
     private int priceKrw;
 
+    public void updateBasic(String nameKo, String nameEn, String nameJa, String nameZh, int priceKrw) {
+        this.nameKo = nameKo;
+        this.nameEn = nameEn;
+        this.nameJa = nameJa;
+        this.nameZh = nameZh;
+        this.priceKrw = priceKrw;
+    }
+
 }
