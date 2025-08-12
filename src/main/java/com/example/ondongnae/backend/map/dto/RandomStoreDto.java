@@ -15,5 +15,6 @@ public class RandomStoreDto {
     private List<String> subCategories;
     private String address;
     private String phone;
+    private String image;
 
 }

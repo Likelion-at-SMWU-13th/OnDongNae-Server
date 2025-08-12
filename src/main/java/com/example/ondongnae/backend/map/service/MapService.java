@@ -12,6 +12,7 @@ import com.example.ondongnae.backend.market.repository.MarketRepository;
 import com.example.ondongnae.backend.store.dto.StoreDetailResponse;
 import com.example.ondongnae.backend.store.model.Store;
 import com.example.ondongnae.backend.store.repository.BusinessHourRepository;
+import com.example.ondongnae.backend.store.repository.StoreImageRepository;
 import com.example.ondongnae.backend.store.repository.StoreRepository;
 import com.example.ondongnae.backend.store.service.StoreDetailService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class MapService {
     private final StoreRepository storeRepository;
     private final StoreDetailService storeDetailService;
     private final BusinessHourRepository businessHourRepository;
+    private final StoreImageRepository storeImageRepository;
 
     public MapInitDataResponseDto getMapInitData(String lang) {
 
@@ -107,6 +109,7 @@ public class MapService {
                     .isOpen(status.isOpen())
                     .subCategories(subCategories)
                     .address(languageService.pickByLang(store.getAddressEn(), store.getAddressJa(), store.getAddressZh(), language))
+                    .image(storeImageRepository.findByStoreAndOrder(store, 1).getUrl())
                     .build();
             randomStoreDtoList.add(randomStoreDto);
         }
