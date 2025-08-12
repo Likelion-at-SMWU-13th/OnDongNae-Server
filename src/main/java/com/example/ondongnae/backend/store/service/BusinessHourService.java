@@ -4,6 +4,7 @@ import com.example.ondongnae.backend.global.exception.BaseException;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
 import com.example.ondongnae.backend.member.service.AuthService;
 import com.example.ondongnae.backend.store.dto.BusinessHourRequest;
+import com.example.ondongnae.backend.store.dto.BusinessHourResponse;
 import com.example.ondongnae.backend.store.model.BusinessHour;
 import com.example.ondongnae.backend.store.model.DayOfWeek;
 import com.example.ondongnae.backend.store.model.Store;
@@ -14,10 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -94,6 +92,37 @@ public class BusinessHourService {
         } catch (Exception e) {
             throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "시간 형식은 HH:mm 입니다. (" + fieldName + ")");
         }
+    }
+
+    // 영업 시간 조회
+    public BusinessHourResponse getBusinessHour() {
+        Long storeId = authService.getMyStoreId();
+
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new BaseException(ErrorCode.STORE_NOT_FOUND));
+
+        List<BusinessHour> businessHours = businessHourRepository.findByStoreId(storeId);
+
+        // 요일 순서 정렬
+        List<BusinessHourResponse.Item> items = businessHours.stream()
+                .sorted(Comparator.comparingInt(b -> b.getDayOfWeek().ordinal()))
+                .map(b -> BusinessHourResponse.Item.builder()
+                        .day(b.getDayOfWeek().name())
+                        .open(toTime(b.getOpenTime()))
+                        .close(toTime(b.getCloseTime()))
+                        .closed(b.isClosed())
+                        .build())
+                .toList();
+
+        return BusinessHourResponse.builder()
+                .storeName(store.getNameKo())
+                .items(items)
+                .build();
+    }
+
+    private String toTime(LocalTime time) {
+        if (time == null) return null;
+        return String.format("%02d:%02d", time.getHour(), time.getMinute());
     }
 
 }
