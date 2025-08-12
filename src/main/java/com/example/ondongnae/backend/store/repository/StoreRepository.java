@@ -3,8 +3,10 @@ package com.example.ondongnae.backend.store.repository;
 import com.example.ondongnae.backend.store.model.Store;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -18,4 +20,8 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     Optional<Store> findById(Long id);
 
     Optional<Store> findByMemberId(Long member_Id);
+
+    @Query(value = "SELECT * FROM store ORDER BY RAND() LIMIT 3", nativeQuery = true)
+    List<Store> pickRandom();
+
 }

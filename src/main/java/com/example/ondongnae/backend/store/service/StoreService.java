@@ -11,7 +11,7 @@ import com.example.ondongnae.backend.global.dto.TranslateResponseDto;
 import com.example.ondongnae.backend.global.exception.BaseException;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
 import com.example.ondongnae.backend.global.service.FileService;
-import com.example.ondongnae.backend.global.service.MapService;
+import com.example.ondongnae.backend.global.service.LatLngService;
 import com.example.ondongnae.backend.global.service.TranslateService;
 import com.example.ondongnae.backend.market.model.Market;
 import com.example.ondongnae.backend.market.repository.MarketRepository;
@@ -56,7 +56,7 @@ public class StoreService {
     private final MainCategoryRepository mainCategoryRepository;
     private final SubCategoryRepository SubCategoryRepository;
     private final TranslateService translateService;
-    private final MapService mapService;
+    private final LatLngService latLngService;
     private final StoreRepository storeRepository;
     private final StoreImageRepository storeImageRepository;
     private final StoreIntroRepository storeIntroRepository;
@@ -81,7 +81,7 @@ public class StoreService {
         TranslateResponseDto translateAddress = translateService.translate(registerStoreDto.getAddress());
 
         // 위도 경도 변환
-        LatLngResponseDto latLngByAddress = mapService.getLatLngByAddress(registerStoreDto.getAddress());
+        LatLngResponseDto latLngByAddress = latLngService.getLatLngByAddress(registerStoreDto.getAddress());
         if (latLngByAddress == null) {
             throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "외부 API로부터 위도, 경도를 불러오지 못했습니다.");
         }

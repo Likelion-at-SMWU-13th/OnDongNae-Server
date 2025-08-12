@@ -119,7 +119,7 @@ public class StoreDetailService {
     }
 
     // 오늘 영업 상태 계산
-    private StoreDetailResponse.Status buildTodayStatus(List<BusinessHour> weekly) {
+    public StoreDetailResponse.Status buildTodayStatus(List<BusinessHour> weekly) {
         var nowKst = LocalTime.now(ZoneId.of("Asia/Seoul"));
         var todayJava = LocalDate.now(ZoneId.of("Asia/Seoul")).getDayOfWeek();
 
