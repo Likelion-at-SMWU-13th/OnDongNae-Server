@@ -18,17 +18,16 @@ public class FileService {
     }
 
     @Value("${AWS_BUCKET}")
-    private String bucket;
+    public String bucket;
 
     public String uploadFile(MultipartFile file) {
         try {
             String fileName = file.getOriginalFilename();
-            String fileUrl = "https://" + bucket + "/" + fileName;
             ObjectMetadata metadata = new ObjectMetadata();
             metadata.setContentType(file.getContentType());
             metadata.setContentLength(file.getSize());
             s3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
-            return fileUrl;
+            return s3Client.getUrl(bucket, fileName).toString();
         } catch (IOException e) {
             e.printStackTrace();
         }
