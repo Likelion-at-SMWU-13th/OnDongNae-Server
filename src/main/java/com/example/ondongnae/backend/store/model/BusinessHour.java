@@ -2,6 +2,7 @@ package com.example.ondongnae.backend.store.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.time.LocalTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class BusinessHour {
 
     @Id
@@ -29,5 +31,5 @@ public class BusinessHour {
 
     private LocalTime closeTime;
 
-    private boolean isClosed;
+    private boolean closed;
 }
