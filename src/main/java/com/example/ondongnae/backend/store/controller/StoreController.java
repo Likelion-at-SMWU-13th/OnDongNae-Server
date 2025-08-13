@@ -1,7 +1,6 @@
 package com.example.ondongnae.backend.store.controller;
 
 import com.example.ondongnae.backend.global.response.ApiResponse;
-import com.example.ondongnae.backend.store.dto.StoreDescriptionDto;
 import com.example.ondongnae.backend.store.dto.StoreDetailResponse;
 import com.example.ondongnae.backend.store.service.StoreDescriptionService;
 import com.example.ondongnae.backend.store.service.StoreDetailService;
@@ -31,6 +30,14 @@ public class StoreController {
     public ResponseEntity<ApiResponse<?>> getStoreDetailDescription(@RequestParam String ver) {
         Object storeDescription = storeDescriptionService.getStoreDescription(ver);
         return ResponseEntity.ok(ApiResponse.ok(storeDescription));
+    }
+
+    // 가게 설명 수정
+    @PatchMapping("/me/store/description")
+    public ResponseEntity<ApiResponse<?>> updateStoreDescription(@RequestParam String ver,
+                                                                 @RequestBody String description) {
+        storeDescriptionService.updateStoreDescription(ver, description);
+        return ResponseEntity.ok(ApiResponse.ok(null));
     }
 
 }
