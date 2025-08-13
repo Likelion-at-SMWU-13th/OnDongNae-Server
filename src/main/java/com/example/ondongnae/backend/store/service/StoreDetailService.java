@@ -11,15 +11,14 @@ import com.example.ondongnae.backend.store.repository.BusinessHourRepository;
 import com.example.ondongnae.backend.store.repository.StoreIntroRepository;
 import com.example.ondongnae.backend.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -48,9 +47,7 @@ public class StoreDetailService {
         String address = pickLang(store.getAddressKo(), store.getAddressEn(), store.getAddressJa(), store.getAddressZh(), resolvedLang);
 
         // 5. 가게 소개(짧은/긴) 조회 (언어별)
-        StoreIntro intro = storeIntroRepository.findFirstByStoreIdAndLang(store.getId(), resolvedLang).orElse(null);
-        String shortIntro = intro != null ? intro.getShortIntro() : "";
-        String longIntro  = intro != null ? intro.getLongIntro()  : "";
+        Map<String, String> storeDescription = getStoreDescription(store.getId(), resolvedLang);
 
         // 6. 가게 이미지 (order 순서대로 최대 4장)
         List<String> images = store.getStoreImages().stream()
@@ -100,12 +97,12 @@ public class StoreDetailService {
         // 11. header 섹션 조립 (nameKo 항상 포함)
         var header = StoreDetailResponse.Header.builder()
                 .images(images).name(name).nameKo(store.getNameKo()).status(status)
-                .weeklyHours(weeklyHours).shortIntro(shortIntro)
+                .weeklyHours(weeklyHours).shortIntro(storeDescription.get("shortIntro"))
                 .build();
 
         // 12. info 섹션 조립
         var info = StoreDetailResponse.Info.builder()
-                .longIntro(longIntro).phone(store.getPhone()).address(address)
+                .longIntro(storeDescription.get("longIntro")).phone(store.getPhone()).address(address)
                 .build();
 
         // 13. map 섹션 조립
@@ -116,6 +113,18 @@ public class StoreDetailService {
         return StoreDetailResponse.builder()
                 .header(header).menuTab(menuItems).infoTab(info).map(map)
                 .build();
+    }
+
+    public Map<String, String> getStoreDescription(Long storeId, String resolvedLang) {
+        Map<String, String> storeIntro = new HashMap<>();
+        StoreIntro intro = storeIntroRepository.findFirstByStoreIdAndLang(storeId, resolvedLang).orElse(null);
+
+        String shortIntro = intro != null ? intro.getShortIntro() : "";
+        String longIntro  = intro != null ? intro.getLongIntro()  : "";
+        storeIntro.put("shortIntro", shortIntro);
+        storeIntro.put("longIntro", longIntro);
+
+        return storeIntro;
     }
 
     // 오늘 영업 상태 계산
