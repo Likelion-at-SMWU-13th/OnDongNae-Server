@@ -203,7 +203,7 @@ public class StoreService {
         }
 
         DescriptionCreateRequestDto descriptionCreateRequestDto = DescriptionCreateRequestDto.builder()
-                .name(registerStoreDto.getMarketName())
+                .name(registerStoreDto.getStoreName())
                 .address(registerStoreDto.getAddress())
                 .mainCategory(mainCategory.getNameKo())
                 .subCategory(subCategories)
