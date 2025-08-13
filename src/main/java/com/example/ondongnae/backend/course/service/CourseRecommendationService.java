@@ -25,6 +25,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
@@ -47,6 +48,7 @@ public class CourseRecommendationService {
     private final TranslateService translateService;
     private final LanguageService languageService;
 
+    @Transactional
     public CourseRecommendResponseDto getCourseRecommendationByAI(SelectedOptionDto selectedOptionDto, String lang) {
 
         // 코스 생성

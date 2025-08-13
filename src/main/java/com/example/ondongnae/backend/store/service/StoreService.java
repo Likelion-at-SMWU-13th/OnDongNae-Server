@@ -35,6 +35,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,6 +63,7 @@ public class StoreService {
     private final StoreIntroRepository storeIntroRepository;
     private final FileService fileService;
 
+    @Transactional
     public Long registerStore(RegisterStoreDto registerStoreDto) {
 
         // 설명 생성
