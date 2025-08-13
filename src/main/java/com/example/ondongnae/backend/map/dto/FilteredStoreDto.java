@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class RandomStoreDto {
+public class FilteredStoreDto {
 
     private Long id;
     private String name;
@@ -16,5 +16,7 @@ public class RandomStoreDto {
     private String address;
     private String phone;
     private String image;
+    private Double latitude;
+    private Double longitude;
 
 }
