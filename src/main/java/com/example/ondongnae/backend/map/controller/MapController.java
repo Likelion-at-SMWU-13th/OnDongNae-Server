@@ -44,7 +44,7 @@ public class MapController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<ApiResponse<?>> searchStore(@CookieValue(name="language", required = false) String language,
+    public ResponseEntity<ApiResponse<?>> searchStore(@RequestHeader(name="Accept-Language", required = false) String language,
                                                       @RequestParam String keyword){
         List<StoreDataResponseDto> storeDataResponseDtoList = storeSearchService.searchStoreByKeyword(language, keyword);
         if (storeDataResponseDtoList == null || storeDataResponseDtoList.isEmpty()){
