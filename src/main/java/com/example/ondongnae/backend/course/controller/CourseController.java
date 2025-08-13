@@ -27,7 +27,7 @@ public class CourseController {
     private final CourseService courseService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<?>> getRandomCourses(@CookieValue(name="language", required = false) String language) {
+    public ResponseEntity<ApiResponse<?>> getRandomCourses(@RequestHeader(name="Accept-Language", required = false) String language) {
         List<RandomCourseDto> randomCourses = courseService.getRandomCourses(language);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.ok(randomCourses));
@@ -35,7 +35,7 @@ public class CourseController {
 
 
     @GetMapping("/{courseId}")
-    public ResponseEntity<ApiResponse<?>> getCourseDetail(@CookieValue(name="language", required = false) String language,
+    public ResponseEntity<ApiResponse<?>> getCourseDetail(@RequestHeader(name="Accept-Language", required = false) String language,
                                                            @PathVariable Long courseId) {
         CourseDetailDto courseDetail = courseService.getCourseDetail(courseId, language);
         return ResponseEntity.status(HttpStatus.OK)
@@ -43,7 +43,7 @@ public class CourseController {
     }
 
     @GetMapping("/options")
-    public ResponseEntity<ApiResponse<?>> getOptions(@CookieValue(name="language", required = false) String language) {
+    public ResponseEntity<ApiResponse<?>> getOptions(@RequestHeader(name="Accept-Language", required = false) String language) {
         List<OptionAndMarketRequestDto> options = optionService.getOptionNames(language);
         List<OptionAndMarketRequestDto> markets = marketService.getMarketNames(language);
         Map<String, List<OptionAndMarketRequestDto>> result = new HashMap<>();
@@ -54,7 +54,7 @@ public class CourseController {
     }
 
     @PostMapping("/recommend")
-    public ResponseEntity<ApiResponse<?>> courseRecommendation(@CookieValue(name="language", required = false) String language,
+    public ResponseEntity<ApiResponse<?>> courseRecommendation(@RequestHeader(name="Accept-Language", required = false) String language,
                                                            @Valid @RequestBody SelectedOptionDto selectedOptionDto) {
         System.out.println("lang" + language);
         CourseRecommendResponseDto courseRecommendation = courseRecommendationService.getCourseRecommendationByAI(selectedOptionDto, language);

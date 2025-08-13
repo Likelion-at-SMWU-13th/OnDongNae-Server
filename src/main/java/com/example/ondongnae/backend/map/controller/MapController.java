@@ -23,14 +23,14 @@ public class MapController {
     private final StoreSearchService storeSearchService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<?>> getMapInitData(@CookieValue(name="language", required = false) String language){
+    public ResponseEntity<ApiResponse<?>> getMapInitData(@RequestHeader(name="Accept-Language", required = false) String language){
         MapInitDataResponseDto mapInitData = mapService.getMapInitData(language);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.ok(mapInitData));
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<ApiResponse<?>> getMapFilter(@CookieValue(name="language", required = false) String language,
+    public ResponseEntity<ApiResponse<?>> getMapFilter(@RequestHeader(name="Accept-Language", required = false) String language,
                                                        @RequestParam(required = false) Long market,
                                                        @RequestParam(required = false) Long main,
                                                        @RequestParam(required = false) List<Long> sub){
