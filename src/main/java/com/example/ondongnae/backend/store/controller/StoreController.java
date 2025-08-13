@@ -28,8 +28,9 @@ public class StoreController {
 
     // 가게 설명 조회
     @GetMapping("/me/store/description")
-    public ResponseEntity<ApiResponse<?>> getStoreDetailDescription() {
-        StoreDescriptionDto storeDescription = storeDescriptionService.getStoreDescription();
+    public ResponseEntity<ApiResponse<?>> getStoreDetailDescription(@RequestParam String ver) {
+        Object storeDescription = storeDescriptionService.getStoreDescription(ver);
         return ResponseEntity.ok(ApiResponse.ok(storeDescription));
     }
+
 }
