@@ -6,7 +6,7 @@ import com.example.ondongnae.backend.category.repository.SubCategoryRepository;
 import com.example.ondongnae.backend.global.exception.BaseException;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
 import com.example.ondongnae.backend.global.service.LanguageService;
-import com.example.ondongnae.backend.map.dto.FilteredStoreDto;
+import com.example.ondongnae.backend.map.dto.StoreDataResponseDto;
 import com.example.ondongnae.backend.market.repository.MarketRepository;
 import com.example.ondongnae.backend.store.dto.StoreDetailResponse;
 import com.example.ondongnae.backend.store.model.Store;
@@ -15,6 +15,7 @@ import com.example.ondongnae.backend.store.repository.StoreImageRepository;
 import com.example.ondongnae.backend.store.repository.StoreRepository;
 import com.example.ondongnae.backend.store.service.StoreDetailService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class MapStoreFilterService {
     private final StoreDetailService storeDetailService;
     private final BusinessHourRepository businessHourRepository;
 
-    public List<FilteredStoreDto> getFilteredStoreDtoList(String lang, Long marketId, Long mainCategoryId, List<Long> subCategoryIds) {
+    public List<StoreDataResponseDto> getFilteredStoreDtoList(String lang, Long marketId, Long mainCategoryId, List<Long> subCategoryIds) {
 
         String language = lang == null ? "en" : lang.strip().toLowerCase();
 
@@ -50,14 +51,11 @@ public class MapStoreFilterService {
 
         // 필터링된 가게 조회
         List<Store> stores;
-        List<String> subCategoryNameList = new ArrayList<>();
 
         if (subCategoryIds != null) {
             for (Long subCategoryId : subCategoryIds) {
-                SubCategory sub = subCategoryRepository.findById(subCategoryId)
+                subCategoryRepository.findById(subCategoryId)
                         .orElseThrow(() -> new BaseException(ErrorCode.INVALID_INPUT_VALUE, "해당 id의 소분류가 존재하지 않습니다."));
-
-                subCategoryNameList.add(languageService.pickByLang(sub.getNameEn(), sub.getNameJa(), sub.getNameZh(), language));
             }
             List<Long> uniqueIds = subCategoryIds.stream().distinct().collect(Collectors.toList());
             stores = storeRepository.findByMarketIdAndMainCategoryIdAndSubCategoryIds(marketId, mainCategoryId, uniqueIds, Long.valueOf(uniqueIds.size()));
@@ -65,16 +63,27 @@ public class MapStoreFilterService {
             stores = storeRepository.findByMarketIdAndMainCategoryId(marketId, mainCategoryId);
         }
 
-        // FilteredStoreDto 리스트 생성
-        List<FilteredStoreDto> filteredStoreDtoList = new ArrayList<>();
+        // StoreDataResponseDto 리스트 생성
+        return getStoreDataResponseDtos(stores, language);
+    }
+
+    public List<StoreDataResponseDto> getStoreDataResponseDtos(List<Store> stores, String language) {
+        List<StoreDataResponseDto> storeDataResponseDtoList = new ArrayList<>();
 
         if (stores == null || stores.size() == 0)
             return null;
         else {
             stores.forEach(s -> {
+                List<String> subCategoryNameList = new ArrayList<>();
+
                 StoreDetailResponse.Status status = storeDetailService.buildTodayStatus(businessHourRepository.findByStoreId(s.getId()));
 
-                FilteredStoreDto filteredStoreDto = FilteredStoreDto.builder().id(s.getId())
+                s.getStoreSubCategories().forEach(subCategory -> {
+                    SubCategory sub = subCategory.getSubCategory();
+                    subCategoryNameList.add(languageService.pickByLang(sub.getNameEn(), sub.getNameJa(), sub.getNameZh(), language));
+                });
+
+                StoreDataResponseDto storeDataResponseDto = StoreDataResponseDto.builder().id(s.getId())
                         .name(languageService.pickByLang(s.getNameEn(), s.getNameJa(), s.getNameZh(), language))
                         .image(storeImageRepository.findFirstByStoreOrderByOrderAsc(s).getUrl())
                         .phone(s.getPhone())
@@ -85,9 +94,9 @@ public class MapStoreFilterService {
                         .longitude(s.getLng())
                         .build();
 
-                filteredStoreDtoList.add(filteredStoreDto);
+                storeDataResponseDtoList.add(storeDataResponseDto);
             });
-            return filteredStoreDtoList;
+            return storeDataResponseDtoList;
         }
     }
 }

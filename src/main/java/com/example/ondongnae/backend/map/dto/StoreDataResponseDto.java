@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class FilteredStoreDto {
+public class StoreDataResponseDto {
 
     private Long id;
     private String name;
