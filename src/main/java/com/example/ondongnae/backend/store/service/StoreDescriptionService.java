@@ -14,12 +14,10 @@ public class StoreDescriptionService {
     private final AuthService authService;
     private final StoreDetailService storeDetailService;
 
-    public StoreDescriptionDto getStoreDescription(String lang) {
-        String language = lang == null ? "en" : lang.strip().toLowerCase();
-
+    public StoreDescriptionDto getStoreDescription() {
         Long myStoreId = authService.getMyStoreId();
 
-        Map<String, String> storeDescription = storeDetailService.getStoreDescription(myStoreId, language);
+        Map<String, String> storeDescription = storeDetailService.getStoreDescription(myStoreId, "ko");
 
         return StoreDescriptionDto.builder().shortDescription(storeDescription.get("shortIntro")).longDescription(storeDescription.get("longIntro")).build();
     }

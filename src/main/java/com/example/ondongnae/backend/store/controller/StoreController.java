@@ -28,8 +28,8 @@ public class StoreController {
 
     // 가게 설명 조회
     @GetMapping("/me/store/description")
-    public ResponseEntity<ApiResponse<?>> getStoreDetailDescription(@RequestHeader(name="Accept-Language", required = false) String language) {
-        StoreDescriptionDto storeDescription = storeDescriptionService.getStoreDescription(language);
+    public ResponseEntity<ApiResponse<?>> getStoreDetailDescription() {
+        StoreDescriptionDto storeDescription = storeDescriptionService.getStoreDescription();
         return ResponseEntity.ok(ApiResponse.ok(storeDescription));
     }
 }
