@@ -109,7 +109,7 @@ public class MapService {
                     .isOpen(status.isOpen())
                     .subCategories(subCategories)
                     .address(languageService.pickByLang(store.getAddressEn(), store.getAddressJa(), store.getAddressZh(), language))
-                    .image(storeImageRepository.findByStoreAndOrder(store, 1).getUrl())
+                    .image(storeImageRepository.findFirstByStoreOrderByOrderAsc(store).getUrl())
                     .build();
             randomStoreDtoList.add(randomStoreDto);
         }
