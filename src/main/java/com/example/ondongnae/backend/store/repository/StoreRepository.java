@@ -48,4 +48,16 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 """)
     List<Store> findByMarketIdAndMainCategoryId(@Param("marketId") Long marketId,
                                                   @Param("mainCategoryId") Long mainCategoryId);
+
+    @Query("""
+    select s
+    from Store s
+    where
+        lower(s.nameEn) like lower(concat('%', :keyword, '%')) or
+        lower(s.nameKo) like lower(concat('%', :keyword, '%')) or
+        lower(s.nameZh) like lower(concat('%', :keyword, '%')) or
+        lower(s.nameJa) like lower(concat('%', :keyword, '%'))
+""")
+    List<Store> findByKeyword(@Param("keyword") String keyword);
+
 }

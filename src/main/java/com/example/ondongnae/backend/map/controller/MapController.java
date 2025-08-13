@@ -5,6 +5,7 @@ import com.example.ondongnae.backend.map.dto.StoreDataResponseDto;
 import com.example.ondongnae.backend.map.dto.MapInitDataResponseDto;
 import com.example.ondongnae.backend.map.service.MapService;
 import com.example.ondongnae.backend.map.service.MapStoreFilterService;
+import com.example.ondongnae.backend.store.service.StoreSearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ public class MapController {
 
     private final MapService mapService;
     private final MapStoreFilterService mapStoreFilterService;
+    private final StoreSearchService storeSearchService;
 
     @GetMapping
     public ResponseEntity<ApiResponse<?>> getMapInitData(@CookieValue(name="language", required = false) String language){
@@ -39,6 +41,18 @@ public class MapController {
         }
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.ok(storeDataResponseDtoList));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<?>> searchStore(@CookieValue(name="language", required = false) String language,
+                                                      @RequestParam String keyword){
+        List<StoreDataResponseDto> storeDataResponseDtoList = storeSearchService.searchStoreByKeyword(language, keyword);
+        if (storeDataResponseDtoList == null || storeDataResponseDtoList.isEmpty()){
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(ApiResponse.ok("조건과 일치하는 가게가 없습니다.", null));
+        }
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse.ok(storeDataResponseDtoList));
     }
 
 }
