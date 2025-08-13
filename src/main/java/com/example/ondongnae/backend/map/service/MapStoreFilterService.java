@@ -15,6 +15,7 @@ import com.example.ondongnae.backend.store.repository.StoreImageRepository;
 import com.example.ondongnae.backend.store.repository.StoreRepository;
 import com.example.ondongnae.backend.store.service.StoreDetailService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -50,14 +51,11 @@ public class MapStoreFilterService {
 
         // 필터링된 가게 조회
         List<Store> stores;
-        List<String> subCategoryNameList = new ArrayList<>();
 
         if (subCategoryIds != null) {
             for (Long subCategoryId : subCategoryIds) {
-                SubCategory sub = subCategoryRepository.findById(subCategoryId)
+                subCategoryRepository.findById(subCategoryId)
                         .orElseThrow(() -> new BaseException(ErrorCode.INVALID_INPUT_VALUE, "해당 id의 소분류가 존재하지 않습니다."));
-
-                subCategoryNameList.add(languageService.pickByLang(sub.getNameEn(), sub.getNameJa(), sub.getNameZh(), language));
             }
             List<Long> uniqueIds = subCategoryIds.stream().distinct().collect(Collectors.toList());
             stores = storeRepository.findByMarketIdAndMainCategoryIdAndSubCategoryIds(marketId, mainCategoryId, uniqueIds, Long.valueOf(uniqueIds.size()));
@@ -65,14 +63,25 @@ public class MapStoreFilterService {
             stores = storeRepository.findByMarketIdAndMainCategoryId(marketId, mainCategoryId);
         }
 
-        // FilteredStoreDto 리스트 생성
+        // StoreDataResponseDto 리스트 생성
+        return getStoreDataResponseDtos(stores, language);
+    }
+
+    public List<StoreDataResponseDto> getStoreDataResponseDtos(List<Store> stores, String language) {
         List<StoreDataResponseDto> storeDataResponseDtoList = new ArrayList<>();
 
         if (stores == null || stores.size() == 0)
             return null;
         else {
             stores.forEach(s -> {
+                List<String> subCategoryNameList = new ArrayList<>();
+
                 StoreDetailResponse.Status status = storeDetailService.buildTodayStatus(businessHourRepository.findByStoreId(s.getId()));
+
+                s.getStoreSubCategories().forEach(subCategory -> {
+                    SubCategory sub = subCategory.getSubCategory();
+                    subCategoryNameList.add(languageService.pickByLang(sub.getNameEn(), sub.getNameJa(), sub.getNameZh(), language));
+                });
 
                 StoreDataResponseDto storeDataResponseDto = StoreDataResponseDto.builder().id(s.getId())
                         .name(languageService.pickByLang(s.getNameEn(), s.getNameJa(), s.getNameZh(), language))
