@@ -6,7 +6,7 @@ import com.example.ondongnae.backend.category.repository.SubCategoryRepository;
 import com.example.ondongnae.backend.global.exception.BaseException;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
 import com.example.ondongnae.backend.global.service.LanguageService;
-import com.example.ondongnae.backend.map.dto.FilteredStoreDto;
+import com.example.ondongnae.backend.map.dto.StoreDataResponseDto;
 import com.example.ondongnae.backend.market.repository.MarketRepository;
 import com.example.ondongnae.backend.store.dto.StoreDetailResponse;
 import com.example.ondongnae.backend.store.model.Store;
@@ -34,7 +34,7 @@ public class MapStoreFilterService {
     private final StoreDetailService storeDetailService;
     private final BusinessHourRepository businessHourRepository;
 
-    public List<FilteredStoreDto> getFilteredStoreDtoList(String lang, Long marketId, Long mainCategoryId, List<Long> subCategoryIds) {
+    public List<StoreDataResponseDto> getFilteredStoreDtoList(String lang, Long marketId, Long mainCategoryId, List<Long> subCategoryIds) {
 
         String language = lang == null ? "en" : lang.strip().toLowerCase();
 
@@ -66,7 +66,7 @@ public class MapStoreFilterService {
         }
 
         // FilteredStoreDto 리스트 생성
-        List<FilteredStoreDto> filteredStoreDtoList = new ArrayList<>();
+        List<StoreDataResponseDto> storeDataResponseDtoList = new ArrayList<>();
 
         if (stores == null || stores.size() == 0)
             return null;
@@ -74,7 +74,7 @@ public class MapStoreFilterService {
             stores.forEach(s -> {
                 StoreDetailResponse.Status status = storeDetailService.buildTodayStatus(businessHourRepository.findByStoreId(s.getId()));
 
-                FilteredStoreDto filteredStoreDto = FilteredStoreDto.builder().id(s.getId())
+                StoreDataResponseDto storeDataResponseDto = StoreDataResponseDto.builder().id(s.getId())
                         .name(languageService.pickByLang(s.getNameEn(), s.getNameJa(), s.getNameZh(), language))
                         .image(storeImageRepository.findFirstByStoreOrderByOrderAsc(s).getUrl())
                         .phone(s.getPhone())
@@ -85,9 +85,9 @@ public class MapStoreFilterService {
                         .longitude(s.getLng())
                         .build();
 
-                filteredStoreDtoList.add(filteredStoreDto);
+                storeDataResponseDtoList.add(storeDataResponseDto);
             });
-            return filteredStoreDtoList;
+            return storeDataResponseDtoList;
         }
     }
 }
