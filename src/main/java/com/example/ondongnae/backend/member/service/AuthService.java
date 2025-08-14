@@ -12,28 +12,25 @@ import com.example.ondongnae.backend.store.dto.DescriptionResponseDto;
 import com.example.ondongnae.backend.store.model.Store;
 import com.example.ondongnae.backend.store.repository.StoreRepository;
 import com.example.ondongnae.backend.store.service.StoreService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final JwtProvider jwtProvider;
-    private final StoreService storeService;
 
-    public AuthService(MemberRepository memberRepository, StoreRepository storeRepository, JwtProvider jwtProvider, StoreService storeService) {
-        this.memberRepository = memberRepository;
-        this.storeRepository = storeRepository;
-        this.jwtProvider = jwtProvider;
-        this.storeService = storeService;
-    }
-    
+    @Transactional
     public Map<String, Object> addUser(SignUpDto signUpDto) {
         String password1 = signUpDto.getPassword1();
         String password2 = signUpDto.getPassword2();

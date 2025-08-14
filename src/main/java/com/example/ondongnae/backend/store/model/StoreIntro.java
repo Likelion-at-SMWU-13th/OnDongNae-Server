@@ -29,4 +29,13 @@ public class StoreIntro {
 
     @Column(nullable = false, length = 3000)
     private String longIntro;
+
+    public void updateShortIntro(String shortIntro) {
+        this.shortIntro = shortIntro;
+    }
+
+    public void updateLongIntro(String longIntro) {
+        this.longIntro = longIntro;
+    }
+
 }
