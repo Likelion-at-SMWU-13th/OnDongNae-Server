@@ -1,5 +1,7 @@
 package com.example.ondongnae.backend.allergy.controller;
 
+import com.example.ondongnae.backend.allergy.dto.AllergyApplyRequest;
+import com.example.ondongnae.backend.allergy.dto.AllergyApplyResponse;
 import com.example.ondongnae.backend.allergy.dto.AllergyExtractResponse;
 import com.example.ondongnae.backend.allergy.service.AllergyService;
 import com.example.ondongnae.backend.global.response.ApiResponse;
@@ -19,4 +21,14 @@ public class AllergyController {
         var result = allergyService.extractAllFromMyMenus();
         return ResponseEntity.ok(ApiResponse.ok("알레르기 추출 성공", result));
     }
+
+    // 알레르기 추출 결과 저장
+    @PostMapping("/me/menus/allergens/apply")
+    public ResponseEntity<ApiResponse<AllergyApplyResponse>> apply(
+            @RequestBody AllergyApplyRequest req
+    ) {
+        var result = allergyService.applyToMyMenus(req);
+        return ResponseEntity.ok(ApiResponse.ok("알레르기 저장 성공", result));
+    }
+
 }

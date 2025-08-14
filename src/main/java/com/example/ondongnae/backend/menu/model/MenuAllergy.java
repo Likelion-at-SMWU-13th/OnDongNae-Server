@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class MenuAllergy {
 
@@ -23,5 +22,16 @@ public class MenuAllergy {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="menu_id")
     private Menu menu;
+
+    protected MenuAllergy() {} // JPA
+
+    private MenuAllergy(Menu menu, Allergy allergy) {
+        this.menu = menu;
+        this.allergy = allergy;
+    }
+
+    public static MenuAllergy of(Menu menu, Allergy allergy) {
+        return new MenuAllergy(menu, allergy);
+    }
 
 }
