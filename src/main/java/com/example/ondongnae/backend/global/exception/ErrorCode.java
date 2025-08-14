@@ -21,8 +21,13 @@ public enum ErrorCode {
 
     // 외부 API 관련
     EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EXTERNAL_API_ERROR", "외부 API 연결에 실패했거나 응답이 유효하지 않습니다."),
+    GPT_BAD_RESPONSE(HttpStatus.BAD_GATEWAY, "GPT_BAD_RESPONSE", "모델 응답 형식이 올바르지 않습니다."),
+    GPT_PROVIDER_ERROR(HttpStatus.BAD_GATEWAY, "GPT_PROVIDER_ERROR", "모델 응답 생성 중 오류가 발생했습니다."),
+
 
     // 메뉴 관련
+    MENU_NOT_FOUND(HttpStatus.NOT_FOUND, "MENU_NOT_FOUND", "메뉴 정보를 찾을 수 없습니다."),
+    ALLERGY_NOT_SUPPORTED(HttpStatus.BAD_REQUEST, "ALLERGY_NOT_SUPPORTED", "허용 목록에 없는 알레르기 항목입니다."),
 
     // 가게 관련
     STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_NOT_FOUND", "해당 가게를 찾을 수 없습니다."),
