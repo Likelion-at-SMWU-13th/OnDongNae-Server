@@ -19,9 +19,9 @@ public class StoreController {
     @GetMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponse<StoreDetailResponse>> getStoreDetail(
             @PathVariable Long storeId,
-            @RequestParam(defaultValue = "en") String lang
+            @RequestHeader(value = "Accept-Language", required = false) String acceptLanguage
     ) {
-        var data = storeDetailService.getDetail(storeId, lang);
+        var data = storeDetailService.getDetail(storeId, acceptLanguage);
         return ResponseEntity.ok(ApiResponse.ok("가게 상세 조회 성공", data));
     }
 
