@@ -13,7 +13,7 @@ public class RegisterStoreDto {
     private String storeName;
     @NotNull
     private String address;
-    @NotNull
+
     private String phoneNum;
     @NotNull
     private Long mainCategory;

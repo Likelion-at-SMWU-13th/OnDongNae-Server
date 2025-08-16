@@ -6,9 +6,11 @@ import com.example.ondongnae.backend.map.dto.MapInitDataResponseDto;
 import com.example.ondongnae.backend.map.service.MapService;
 import com.example.ondongnae.backend.map.service.MapStoreFilterService;
 import com.example.ondongnae.backend.store.service.StoreSearchService;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/map")
 @RequiredArgsConstructor
+@Validated
 public class MapController {
 
     private final MapService mapService;
@@ -45,7 +48,7 @@ public class MapController {
 
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<?>> searchStore(@RequestHeader(name="Accept-Language", required = false) String language,
-                                                      @RequestParam String keyword){
+                                                      @NotBlank @RequestParam String keyword){
         List<StoreDataResponseDto> storeDataResponseDtoList = storeSearchService.searchStoreByKeyword(language, keyword);
         if (storeDataResponseDtoList == null || storeDataResponseDtoList.isEmpty()){
             return ResponseEntity.status(HttpStatus.OK)
