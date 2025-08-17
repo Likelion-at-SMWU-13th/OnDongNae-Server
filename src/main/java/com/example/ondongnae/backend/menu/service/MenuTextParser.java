@@ -23,8 +23,8 @@ public class MenuTextParser {
             "(\\d{1,3}(?:,\\d{3})+|\\d+)\\s*(?:원|₩|￦|krw|won)?",
             Pattern.CASE_INSENSITIVE);
     // 라인 끝이나 괄호/공백 사이에 오는 사이즈 토큰들
-    // (한글/한자 혼용, '대/중/소', '大/中/小', 그리고 흔한 오인식: C -> 중으로 매핑)
-    private static final Pattern SIZE_TOKEN = Pattern.compile("(?:\\(|\\s|^)(대|중|소|大|中|小|C)(?:\\)|\\s|$)");
+    // (한글/한자 혼용, '대/중/소', '大/中/小')
+    private static final Pattern SIZE_TOKEN = Pattern.compile("(?:\\(|\\s|^)(대|중|소|大|中|小|)(?:\\)|\\s|$)");
 
     public List<OcrExtractItemDto> parse(String raw) {
         if (raw == null || raw.isBlank()) return List.of();
@@ -34,13 +34,13 @@ public class MenuTextParser {
 
         List<OcrExtractItemDto> result = new ArrayList<>();
         String pendingName = null;      // 가격 없는 이름을 임시 보관
-        String pendingSize = null;      // 라인에서 분리된 사이즈 토큰(중/대/小/中/大/C)
+        String pendingSize = null;      // 라인에서 분리된 사이즈 토큰(중/대/小/中/大)
 
         for (String originalLine : lines) {
             String line = normalize(originalLine);
             if (line.isBlank()) continue;
 
-            // (1) 사이즈 토큰 분리(있으면 보관)
+            // 1. 사이즈 토큰 분리(있으면 보관)
             //  예) "소머리수육 中" -> name="소머리수육", size="중"
             String size = extractSize(line);
             if (size != null) {
@@ -49,7 +49,7 @@ public class MenuTextParser {
                 line = line.trim();
             }
 
-            // (2) 가격 매칭 시도
+            // 2. 가격 매칭 시도
             Matcher m = PRICE.matcher(line);
             if (m.find()) {
                 // 가격 추출 -> 쉼표 제거
@@ -80,7 +80,7 @@ public class MenuTextParser {
                 continue; // 다음 라인
             }
 
-            // (3) 이 라인에는 가격이 없고, 유의미한 이름인 경우 → 다음 줄 가격과 결합하기 위해 보관
+            // 3. 이 라인에는 가격이 없고, 유의미한 이름인 경우 → 다음 줄 가격과 결합하기 위해 보관
             if (!isNoise(line)) {
                 // 만약 이전에 보관된 이름이 남아있다면 먼저 추가(가격 null 허용)
                 // -> "소주" 같은 라인들이 가격이 다른 줄에 없어도 남도록
@@ -105,7 +105,7 @@ public class MenuTextParser {
         return result;
     }
 
-    /** 공백/기호 정리. 콤마(,)는 여기서 건드리지 않는다! (가격 정규식에서 다룸) */
+    // 공백/기호 정리. 콤마는 여기서 건드리지 않음 (가격 정규식에서 다룸)
     private String normalize(String s) {
         // 이모지/기호류 제거 (필요시 축소 가능)
         String noEmoji = s.replaceAll("[\\p{So}\\p{Cn}]", " ");
@@ -117,18 +117,18 @@ public class MenuTextParser {
         return trimmed;
     }
 
-    /** 한 글자 잡값/노이즈 라인 필터 */
+    // 한 글자 잡값/노이즈 라인 필터
     private boolean isNoise(String name) {
         if (name == null) return true;
         String n = name.trim();
         if (n.isEmpty()) return true;
-        // 'C' 같은 한 글자 노이즈 제거
+        // 한 글자 노이즈 제거
         if (n.length() == 1 && !Character.isDigit(n.charAt(0))) return true;
         // 불필요한 접두/접미만 남은 경우
         return false;
     }
 
-    /** "중/대/小/中/大/C" 같은 사이즈 토큰을 (가능하면) 추출 */
+    // "중/대/小/中/大/" 같은 사이즈 토큰을 (가능하면) 추출
     private String extractSize(String line) {
         Matcher m = SIZE_TOKEN.matcher(line);
         if (m.find()) {
@@ -138,23 +138,22 @@ public class MenuTextParser {
         return null;
     }
 
-    /** 라인에서 사이즈 토큰 제거 */
+    // 라인에서 사이즈 토큰 제거
     private String removeSize(String line) {
         return SIZE_TOKEN.matcher(line).replaceAll(" ").replaceAll("\\s{2,}", " ");
     }
 
-    /** 'C' 오인식 → '중'으로 보정, 한자 → 한글 */
+    // 한자 → 한글
     private String normalizeSize(String s) {
         switch (s) {
             case "大": return "대";
             case "中": return "중";
             case "小": return "소";
-            case "C":  return "중"; // 흔한 오탐 보정
             default:   return s;    // 대/중/소
         }
     }
 
-    /** 이름 뒤에 사이즈를 괄호로 표기 */
+    // 이름 뒤에 사이즈를 괄호로 표기
     private String appendSize(String name, String size) {
         name = (name == null ? "" : name.trim());
         if (name.isEmpty()) return name;
