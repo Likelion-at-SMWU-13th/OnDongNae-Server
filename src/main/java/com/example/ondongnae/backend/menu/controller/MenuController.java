@@ -2,12 +2,15 @@ package com.example.ondongnae.backend.menu.controller;
 
 import com.example.ondongnae.backend.global.response.ApiResponse;
 import com.example.ondongnae.backend.menu.dto.*;
+import com.example.ondongnae.backend.menu.service.MenuExtractionService;
 import com.example.ondongnae.backend.menu.service.MenuService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,11 +19,12 @@ import java.util.List;
 @RequestMapping("/me/menus")
 public class MenuController {
     private final MenuService menuService;
+    private final MenuExtractionService menuExtractionService;
 
-    // 수기 메뉴 등록
-    @PostMapping("/manual")
+    // 메뉴 저장 (수기/OCR 공통)
+    @PostMapping("/save")
     public ResponseEntity<ApiResponse<ManualMenuCreateResponse>> createManualMenu(
-            @RequestBody ManualMenuCreateRequest request
+            @Valid @RequestBody ManualMenuCreateRequest request
     ) {
         var response = menuService.createManual(request);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -41,6 +45,13 @@ public class MenuController {
     ) {
         MenuUpdateResponse data = menuService.replaceAll(request);
         return ResponseEntity.ok(ApiResponse.ok("메뉴 수정 완료", data));
+    }
+
+    // OCR 메뉴 추출
+    @PostMapping(value = "/allergens/extract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<OcrExtractResponse>> extract(@RequestPart("image") MultipartFile image) {
+        var res = menuExtractionService.extract(image);
+        return ResponseEntity.ok(ApiResponse.ok("메뉴 추출 성공", res));
     }
 
 }

@@ -1,11 +1,9 @@
 package com.example.ondongnae.backend.global.response;
 
-import com.amazonaws.Response;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
