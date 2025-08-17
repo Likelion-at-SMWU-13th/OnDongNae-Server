@@ -27,7 +27,7 @@ public class MenuService {
     private final MenuAllergyRepository menuAllergyRepository;
     private final TranslateService translateService;
 
-    // 수기 메뉴 등록
+    // 메뉴 저장 (수기/OCR 공통)
     @Transactional
     public ManualMenuCreateResponse createManual(ManualMenuCreateRequest request) {
         // 1. 토큰 -> 내 가게 ID 추출
