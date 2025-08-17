@@ -11,12 +11,11 @@ import com.example.ondongnae.backend.global.exception.BaseException;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
 import com.example.ondongnae.backend.global.service.LanguageService;
 import com.example.ondongnae.backend.store.model.Store;
+import com.example.ondongnae.backend.store.repository.StoreImageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +25,7 @@ public class CourseService {
     private final CourseStoreRepository courseStoreRepository;
     private final CourseRecommendationService courseRecommendationService;
     private final LanguageService languageService;
+    private final StoreImageRepository storeImageRepository;
 
     public CourseDetailDto getCourseDetail(Long courseId, String lang) {
         // 코스 조회
@@ -57,7 +57,8 @@ public class CourseService {
 
         // 랜덤 코스 조회
         List<Course> courses = courseRepository.pickRandom();
-        List<RandomCourseDto> randomCourseDtoList = new ArrayList<>();
+        //Map<String, Object> randomCourse = new HashMap<>();
+        List<RandomCourseDto> randomCourseDtos = new ArrayList<>();
 
         for (Course course : courses) {
             String title = languageService.pickByLang(course.getTitleEn(), course.getTitleJa(), course.getTitleZh(), language);
@@ -69,18 +70,23 @@ public class CourseService {
                     .toList();
 
             List<String> storeNames = new ArrayList<>();
+            String mainImageUrl = null;
             for (CourseStore courseStore : courseStores) {
                 Store s = courseStore.getStore();
                 storeNames.add(languageService.pickByLang(s.getNameEn(), s.getNameJa(), s.getNameZh(), language));
+                if (courseStore.getOrder() == 1) {
+                    mainImageUrl = storeImageRepository.findFirstByStoreOrderByOrderAsc(courseStore.getStore()).getUrl();
+                }
             }
 
             RandomCourseDto randomCourseDto = RandomCourseDto.builder().courseTitle(title)
-                    .courseDescription(shortDescription).storeNames(storeNames).id(course.getId()).build();
+                    .courseDescription(shortDescription).storeNames(storeNames).id(course.getId()).mainImageUrl(mainImageUrl).build();
 
-            randomCourseDtoList.add(randomCourseDto);
+            randomCourseDtos.add(randomCourseDto);
         }
+        //randomCourse.put("randomCourses", randomCourseDtos);
 
-        return randomCourseDtoList;
+        return randomCourseDtos;
     }
 
 }

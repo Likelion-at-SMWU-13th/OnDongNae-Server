@@ -16,6 +16,7 @@ import com.example.ondongnae.backend.market.model.Market;
 import com.example.ondongnae.backend.market.repository.MarketRepository;
 import com.example.ondongnae.backend.store.model.Store;
 import com.example.ondongnae.backend.store.model.StoreIntro;
+import com.example.ondongnae.backend.store.repository.StoreImageRepository;
 import com.example.ondongnae.backend.store.repository.StoreIntroRepository;
 import com.example.ondongnae.backend.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CourseRecommendationService {
 
+    private final StoreImageRepository storeImageRepository;
     @Value("${COURSE_RECOMMENDATION_API_URL}")
     private String RECOMMENDATION_API_URL;
 
@@ -90,9 +92,10 @@ public class CourseRecommendationService {
             String longIntro = storeIntro.getLongIntro();
             String shortIntro = storeIntro.getShortIntro();
 
+            String imageUrl = storeImageRepository.findFirstByStoreOrderByOrderAsc(store).getUrl();
 
             RecommendedCourseStoreDto dto = RecommendedCourseStoreDto.builder().name(storeName)
-                    .longDescription(longIntro).shortDescription(shortIntro).order(order).build();
+                    .longDescription(longIntro).shortDescription(shortIntro).order(order).imageUrl(imageUrl).build();
             recommendedCourseStoreDtoList.add(dto);
         }
 
