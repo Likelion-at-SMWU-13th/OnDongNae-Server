@@ -48,7 +48,7 @@ public class MenuController {
     }
 
     // OCR 메뉴 추출
-    @PostMapping(value = "/allergens/extract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/ocr/extract", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<OcrExtractResponse>> extract(@RequestPart("image") MultipartFile image) {
         var res = menuExtractionService.extract(image);
         return ResponseEntity.ok(ApiResponse.ok("메뉴 추출 성공", res));
