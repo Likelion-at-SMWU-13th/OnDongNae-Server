@@ -13,5 +13,6 @@ public class RandomCourseDto {
     private String courseTitle;
     private String courseDescription;
     private List<String> storeNames;
+    private String mainImageUrl;
 
 }
