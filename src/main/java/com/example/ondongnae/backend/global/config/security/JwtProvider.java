@@ -1,6 +1,7 @@
 package com.example.ondongnae.backend.global.config.security;
 
 import com.example.ondongnae.backend.member.dto.TokenDto;
+import com.example.ondongnae.backend.member.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.annotation.PostConstruct;
@@ -18,12 +19,17 @@ import java.util.Date;
 @Component
 public class JwtProvider {
 
-    private final long EXPIRE_ACCESS = 1000 * 60 * 60 * 24; // 1일
+    private final long EXPIRE_ACCESS = 1000 * 60 * 10; // 10분
     private final long EXPIRE_REFRESH = 1000 * 60 * 60 * 24 * 7; // 1주
+    private final RefreshTokenRepository refreshTokenRepository;
     private SecretKey secretKey;
 
     @Value("${jwt.secret}")
     private String secret;
+
+    public JwtProvider(RefreshTokenRepository refreshTokenRepository) {
+        this.refreshTokenRepository = refreshTokenRepository;
+    }
 
     @PostConstruct
     public void init() {
@@ -57,5 +63,14 @@ public class JwtProvider {
     public String getMemberIdFromToken(String token) {
         // Subject로 설정해놓은 id 가져오기
         return parseClaims(token).getSubject();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            parseClaims(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

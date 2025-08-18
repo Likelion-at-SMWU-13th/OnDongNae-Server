@@ -3,19 +3,18 @@ package com.example.ondongnae.backend.member.service;
 import com.example.ondongnae.backend.global.config.security.JwtProvider;
 import com.example.ondongnae.backend.global.exception.BaseException;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
-import com.example.ondongnae.backend.member.dto.RegisterStoreDto;
 import com.example.ondongnae.backend.member.dto.SignUpDto;
 import com.example.ondongnae.backend.member.dto.TokenDto;
 import com.example.ondongnae.backend.member.model.Member;
+import com.example.ondongnae.backend.member.model.RefreshToken;
 import com.example.ondongnae.backend.member.repository.MemberRepository;
-import com.example.ondongnae.backend.store.dto.DescriptionResponseDto;
+import com.example.ondongnae.backend.member.repository.RefreshTokenRepository;
 import com.example.ondongnae.backend.store.model.Store;
 import com.example.ondongnae.backend.store.repository.StoreRepository;
-import com.example.ondongnae.backend.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Repository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +28,8 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final JwtProvider jwtProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public Map<String, Object> addUser(SignUpDto signUpDto) {
@@ -55,7 +56,7 @@ public class AuthService {
 
         Member member = Member.builder()
                 .loginId(signUpDto.getLoginId())
-                .password(password1)
+                .password(passwordEncoder.encode(password1))
                 .name(signUpDto.getName())
                 .phone(signUpDto.getPhoneNum())
                 .build();
@@ -63,6 +64,7 @@ public class AuthService {
         Member savedMember = memberRepository.save(member);
 
         TokenDto tokens = jwtProvider.createTokens(savedMember.getId());
+        refreshTokenRepository.save(RefreshToken.builder().memberId(savedMember.getId()).refreshToken(tokens.getRefreshToken()).build());
 
         Map<String, Object> data = new HashMap<>();
         data.put("memberId", savedMember.getId());
@@ -73,10 +75,10 @@ public class AuthService {
     public TokenDto login(String id, String password) {
         Member member = memberRepository.findByLoginId(id);
 
-        if (member == null || !member.getPassword().equals(password))
+        if (member == null || !passwordEncoder.matches(password, member.getPassword()))
             throw new BaseException(ErrorCode.UNAUTHORIZED, "잘못된 아이디 또는 비밀번호입니다");
         else {
-            TokenDto tokens = jwtProvider.createTokens(member.getId());
+            TokenDto tokens = createAndSaveToken(member.getId());
             return tokens;
         }
     }
@@ -98,5 +100,41 @@ public class AuthService {
         return storeRepository.findByMemberId(member.getId())
                 .map(Store::getId)
                 .orElseThrow(() -> new BaseException(ErrorCode.STORE_NOT_FOUND));
+    }
+
+    public TokenDto reissue(String refreshToken) {
+
+        System.out.println(refreshToken);
+        if (!jwtProvider.validateToken(refreshToken))
+            throw new BaseException(ErrorCode.INVALID_TOKEN, "Refresh Token이 유효하지 않습니다.");
+
+        Long memberId = Long.valueOf(jwtProvider.getMemberIdFromToken(refreshToken));
+
+        RefreshToken savedRefreshToken = refreshTokenRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new BaseException(ErrorCode.TOKEN_NOT_FOUND, "사용자 id에 해당하는 refresh token을 찾을 수 없습니다."));
+
+        if (!savedRefreshToken.getRefreshToken().equals(refreshToken))
+            throw new BaseException(ErrorCode.INVALID_TOKEN, "Refresh Token 값이 올바르지 않습니다.");
+
+        TokenDto tokens = createAndSaveToken(memberId);
+
+        return tokens;
+
+    }
+
+    @Transactional
+    public TokenDto createAndSaveToken(Long memberId) {
+        TokenDto tokens = jwtProvider.createTokens(memberId);
+
+        refreshTokenRepository.findByMemberId(memberId)
+                .ifPresentOrElse(
+                        rt -> {
+                            rt.updateRefreshToken(tokens.getRefreshToken());
+                            refreshTokenRepository.save(rt);
+                        }, () -> {
+                            refreshTokenRepository.save(RefreshToken.builder().memberId(memberId).refreshToken(tokens.getRefreshToken()).build());
+                        }
+                );
+        return tokens;
     }
 }
