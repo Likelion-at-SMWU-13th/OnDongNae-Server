@@ -76,18 +76,11 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.ok("대분류에 해당하는 모든 소분류를 불러왔습니다", subCategories));
     }
-
-
+  
     @PostMapping("/token/refresh")
     public ResponseEntity<ApiResponse<?>> reissue(@RequestBody String refreshToken) {
         TokenDto newTokens = authService.reissue(refreshToken);
         return ResponseEntity.ok().body(ApiResponse.ok(newTokens));
-
-    // 내 정보 조회
-    @GetMapping("/profile")
-    public ResponseEntity<ApiResponse<MyProfileResponse>> getMyProfile() {
-        var data = storeService.getMyProfile();
-        return ResponseEntity.ok(ApiResponse.ok("내 정보 조회 성공", data));
-
     }
+
 }

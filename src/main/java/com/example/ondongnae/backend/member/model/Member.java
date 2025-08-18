@@ -29,4 +29,7 @@ public class Member {
     @Column(nullable = false, length = 14, unique = true)
     private String phone;
 
+    public void changePhone(String phone) { this.phone = phone; }
+    public void changePassword(String encoded) { this.password = encoded; }
+
 }

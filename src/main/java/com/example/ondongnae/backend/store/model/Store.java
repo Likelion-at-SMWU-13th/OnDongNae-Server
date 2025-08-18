@@ -82,4 +82,13 @@ public class Store {
     @Column(nullable = false)
     private Double lng;
 
+    public void updateLocalizedNames(String ko, String en, String ja, String zh) {
+        this.nameKo = ko; this.nameEn = en; this.nameJa = ja; this.nameZh = zh;
+    }
+    public void updateLocalizedAddresses(String ko, String en, String ja, String zh) {
+        this.addressKo = ko; this.addressEn = en; this.addressJa = ja; this.addressZh = zh;
+    }
+    public void updatePhone(String phone) { this.phone = phone; }
+    public void updateLatLng(Double lat, Double lng) { this.lat = lat; this.lng = lng; }
+
 }

@@ -16,6 +16,7 @@ import com.example.ondongnae.backend.global.service.TranslateService;
 import com.example.ondongnae.backend.market.model.Market;
 import com.example.ondongnae.backend.market.repository.MarketRepository;
 import com.example.ondongnae.backend.member.dto.MyProfileResponse;
+import com.example.ondongnae.backend.member.dto.MyProfileUpdateRequest;
 import com.example.ondongnae.backend.member.dto.RegisterStoreDto;
 import com.example.ondongnae.backend.member.model.Member;
 import com.example.ondongnae.backend.member.repository.MemberRepository;
@@ -41,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.*;
 
@@ -65,6 +67,7 @@ public class StoreService {
     private final StoreImageRepository storeImageRepository;
     private final StoreIntroRepository storeIntroRepository;
     private final FileService fileService;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public Long registerStore(RegisterStoreDto registerStoreDto) {
@@ -256,5 +259,68 @@ public class StoreService {
                 .storeAddressKo(store.getAddressKo())
                 .storePhone(store.getPhone())
                 .build();
+    }
+
+    // 내 정보 수정 (가게명/주소 다국어 저장, 주소 -> 위/경도 갱신, (옵션) 비밀번호 변경)
+    @Transactional
+    public void updateMyProfile(MyProfileUpdateRequest req) {
+        Long storeId = authService.getMyStoreId();
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new BaseException(ErrorCode.STORE_NOT_FOUND));
+        Member owner = store.getMember();
+
+        // 변경 감지
+        boolean nameChanged = !req.getStoreNameKo().equals(store.getNameKo());
+        boolean addrChanged = !req.getStoreAddressKo().equals(store.getAddressKo());
+
+        // 상호명 번역/저장 (변경 시에만)
+        if (nameChanged) {
+            TranslateResponseDto nameTr = translateService.translate(req.getStoreNameKo());
+            String nameEn = nvl(nameTr.getEnglish(),  req.getStoreNameKo());
+            String nameJa = nvl(nameTr.getJapanese(), req.getStoreNameKo());
+            String nameZh = nvl(nameTr.getChinese(),  req.getStoreNameKo());
+            store.updateLocalizedNames(req.getStoreNameKo(), nameEn, nameJa, nameZh);
+        }
+
+        // 주소 번역/저장 + 좌표(변경 시에만)
+        if (addrChanged) {
+            TranslateResponseDto addrTr = translateService.translate(req.getStoreAddressKo());
+            String addrEn = nvl(addrTr.getEnglish(),  req.getStoreAddressKo());
+            String addrJa = nvl(addrTr.getJapanese(), req.getStoreAddressKo());
+            String addrZh = nvl(addrTr.getChinese(),  req.getStoreAddressKo());
+            store.updateLocalizedAddresses(req.getStoreAddressKo(), addrEn, addrJa, addrZh);
+
+            // 주소 → 좌표
+            LatLngResponseDto coord = latLngService.getLatLngByAddress(req.getStoreAddressKo());
+            store.updateLatLng(coord.getLat(), coord.getLng());
+        }
+
+        // 연락처/전화 업데이트
+        owner.changePhone(req.getMemberPhone());
+        store.updatePhone(req.getStorePhone());
+
+        // 비밀번호 변경 (두 칸 모두 채워졌을 때만)
+        boolean newFilled     = notBlank(req.getNewPassword());
+        boolean confirmFilled = notBlank(req.getConfirmPassword());
+        if (newFilled || confirmFilled) {
+            if (!(newFilled && confirmFilled)) {
+                throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "비밀번호 변경 시 새 비밀번호와 확인 비밀번호가 모두 필요합니다.");
+            }
+            if (!req.getNewPassword().equals(req.getConfirmPassword())) {
+                throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "비밀번호 확인이 일치하지 않습니다.");
+            }
+            // 기존 비밀번호와 동일 금지
+            if (passwordEncoder.matches(req.getNewPassword(), owner.getPassword())) {
+                throw new BaseException(ErrorCode.INVALID_INPUT_VALUE, "새 비밀번호는 기존 비밀번호와 달라야 합니다.");
+            }
+            owner.changePassword(passwordEncoder.encode(req.getNewPassword()));
+        }
+    }
+
+    private String nvl(String s, String fallback) {
+        return (s == null || s.isBlank()) ? fallback : s;
+    }
+    private boolean notBlank(String s) {
+        return s != null && !s.isBlank();
     }
 }
