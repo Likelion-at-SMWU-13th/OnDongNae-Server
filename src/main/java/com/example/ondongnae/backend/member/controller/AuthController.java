@@ -5,6 +5,7 @@ import com.example.ondongnae.backend.category.service.CategoryService;
 import com.example.ondongnae.backend.global.exception.BaseException;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
 import com.example.ondongnae.backend.global.response.ApiResponse;
+import com.example.ondongnae.backend.member.dto.MyProfileResponse;
 import com.example.ondongnae.backend.member.dto.SignUpDto;
 import com.example.ondongnae.backend.member.dto.RegisterStoreDto;
 import com.example.ondongnae.backend.member.dto.TokenDto;
@@ -76,9 +77,17 @@ public class AuthController {
                 .body(ApiResponse.ok("대분류에 해당하는 모든 소분류를 불러왔습니다", subCategories));
     }
 
+
     @PostMapping("/token/refresh")
     public ResponseEntity<ApiResponse<?>> reissue(@RequestBody String refreshToken) {
         TokenDto newTokens = authService.reissue(refreshToken);
         return ResponseEntity.ok().body(ApiResponse.ok(newTokens));
+
+    // 내 정보 조회
+    @GetMapping("/profile")
+    public ResponseEntity<ApiResponse<MyProfileResponse>> getMyProfile() {
+        var data = storeService.getMyProfile();
+        return ResponseEntity.ok(ApiResponse.ok("내 정보 조회 성공", data));
+
     }
 }

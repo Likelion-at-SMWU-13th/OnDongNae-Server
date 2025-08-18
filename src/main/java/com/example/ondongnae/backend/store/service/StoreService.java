@@ -15,9 +15,11 @@ import com.example.ondongnae.backend.global.service.LatLngService;
 import com.example.ondongnae.backend.global.service.TranslateService;
 import com.example.ondongnae.backend.market.model.Market;
 import com.example.ondongnae.backend.market.repository.MarketRepository;
+import com.example.ondongnae.backend.member.dto.MyProfileResponse;
 import com.example.ondongnae.backend.member.dto.RegisterStoreDto;
 import com.example.ondongnae.backend.member.model.Member;
 import com.example.ondongnae.backend.member.repository.MemberRepository;
+import com.example.ondongnae.backend.member.service.AuthService;
 import com.example.ondongnae.backend.store.dto.AddStoreRequestDto;
 import com.example.ondongnae.backend.store.dto.AddStoreResponseDto;
 import com.example.ondongnae.backend.store.dto.DescriptionCreateRequestDto;
@@ -47,6 +49,7 @@ import java.util.*;
 public class StoreService {
 
     private final StoreSubCategoryRepository storeSubCategoryRepository;
+    private final AuthService authService;
     @Value("${DESC_API_URL}")
     private String API_URL;
     @Value("${ADD_STORE_API_URL}")
@@ -238,5 +241,20 @@ public class StoreService {
             throw new BaseException(ErrorCode.EXTERNAL_API_ERROR, "외부 API 호출 중 알 수 없는 오류가 발생했습니다.");
         }
 
+    }
+
+    // 내 정보 조회
+    @Transactional(readOnly = true)
+    public MyProfileResponse getMyProfile() {
+        Long storeId = authService.getMyStoreId();
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new BaseException(ErrorCode.STORE_NOT_FOUND));
+
+        return MyProfileResponse.builder()
+                .memberPhone(store.getMember().getPhone())
+                .storeNameKo(store.getNameKo())
+                .storeAddressKo(store.getAddressKo())
+                .storePhone(store.getPhone())
+                .build();
     }
 }
