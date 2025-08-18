@@ -18,6 +18,7 @@ public enum ErrorCode {
     AUTH_REQUIRED(HttpStatus.UNAUTHORIZED, "AUTH_REQUIRED", "토큰 인증이 필요합니다."),
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "유효하지 않은 토큰입니다."),
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED,"EXPIRED_TOKEN","만료된 토큰입니다."),
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "TOKEN_NOT_FOUND", "토큰을 찾을 수 없습니다."),
 
     // 외부 API 관련
     EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EXTERNAL_API_ERROR", "외부 API 연결에 실패했거나 응답이 유효하지 않습니다."),
@@ -41,6 +42,7 @@ public enum ErrorCode {
     MARKET_NOT_FOUND(HttpStatus.NOT_FOUND, "MARKET_NOT_FOUND", "해당 시장을 찾을 수 없습니다."),
 
     // 지도 관련
+    INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "INVALID_ADDRESS", "올바르지 않은 주소입니다."),
 
     // 코스 추천 관련
     OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "OPTION_NOT_FOUND", "해당 옵션을 찾을 수 없습니다."),
