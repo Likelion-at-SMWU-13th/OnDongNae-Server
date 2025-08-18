@@ -15,6 +15,7 @@ import com.example.ondongnae.backend.store.service.StoreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,7 @@ public class AuthService {
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
     private final JwtProvider jwtProvider;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public Map<String, Object> addUser(SignUpDto signUpDto) {
@@ -55,7 +57,7 @@ public class AuthService {
 
         Member member = Member.builder()
                 .loginId(signUpDto.getLoginId())
-                .password(password1)
+                .password(passwordEncoder.encode(password1))
                 .name(signUpDto.getName())
                 .phone(signUpDto.getPhoneNum())
                 .build();
@@ -73,7 +75,7 @@ public class AuthService {
     public TokenDto login(String id, String password) {
         Member member = memberRepository.findByLoginId(id);
 
-        if (member == null || !member.getPassword().equals(password))
+        if (member == null || !passwordEncoder.matches(password, member.getPassword()))
             throw new BaseException(ErrorCode.UNAUTHORIZED, "잘못된 아이디 또는 비밀번호입니다");
         else {
             TokenDto tokens = jwtProvider.createTokens(member.getId());
