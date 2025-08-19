@@ -35,9 +35,9 @@ public class AuthController {
 
     @PostMapping("/signup/user")
     public ResponseEntity<ApiResponse<?>> signupUser(@Valid @RequestBody SignUpDto signUpDto) {;
-        Map<String, Object> idAndToken = authService.addUser(signUpDto);
+        Long memberId = authService.addUser(signUpDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.ok("회원가입에 성공했습니다.", idAndToken));
+                    .body(ApiResponse.ok("회원가입에 성공했습니다.", memberId));
     }
 
     @PostMapping("/login")

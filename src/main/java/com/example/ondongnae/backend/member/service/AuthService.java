@@ -32,7 +32,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public Map<String, Object> addUser(SignUpDto signUpDto) {
+    public Long addUser(SignUpDto signUpDto) {
         String password1 = signUpDto.getPassword1();
         String password2 = signUpDto.getPassword2();
         String phoneNum = signUpDto.getPhoneNum();
@@ -63,13 +63,7 @@ public class AuthService {
 
         Member savedMember = memberRepository.save(member);
 
-        TokenDto tokens = jwtProvider.createTokens(savedMember.getId());
-        refreshTokenRepository.save(RefreshToken.builder().memberId(savedMember.getId()).refreshToken(tokens.getRefreshToken()).build());
-
-        Map<String, Object> data = new HashMap<>();
-        data.put("memberId", savedMember.getId());
-        data.put("tokens", tokens);
-        return data;
+        return savedMember.getId();
     }
 
     public TokenDto login(String id, String password) {
