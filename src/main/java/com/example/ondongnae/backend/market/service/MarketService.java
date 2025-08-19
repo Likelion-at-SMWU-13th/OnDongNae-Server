@@ -1,7 +1,6 @@
 package com.example.ondongnae.backend.market.service;
 
 import com.example.ondongnae.backend.course.dto.OptionAndMarketRequestDto;
-import com.example.ondongnae.backend.course.model.Option;
 import com.example.ondongnae.backend.market.model.Market;
 import com.example.ondongnae.backend.market.repository.MarketRepository;
 import org.springframework.stereotype.Service;

@@ -5,7 +5,6 @@ import com.example.ondongnae.backend.category.service.CategoryService;
 import com.example.ondongnae.backend.global.exception.BaseException;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
 import com.example.ondongnae.backend.global.response.ApiResponse;
-import com.example.ondongnae.backend.member.dto.MyProfileResponse;
 import com.example.ondongnae.backend.member.dto.SignUpDto;
 import com.example.ondongnae.backend.member.dto.RegisterStoreDto;
 import com.example.ondongnae.backend.member.dto.TokenDto;
@@ -35,9 +34,9 @@ public class AuthController {
 
     @PostMapping("/signup/user")
     public ResponseEntity<ApiResponse<?>> signupUser(@Valid @RequestBody SignUpDto signUpDto) {;
-        Map<String, Object> idAndToken = authService.addUser(signUpDto);
+        Long memberId = authService.addUser(signUpDto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(ApiResponse.ok("회원가입에 성공했습니다.", idAndToken));
+                    .body(ApiResponse.ok("회원가입에 성공했습니다.", memberId));
     }
 
     @PostMapping("/login")

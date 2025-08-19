@@ -2,16 +2,13 @@ package com.example.ondongnae.backend.currency.controller;
 
 import com.example.ondongnae.backend.currency.dto.PriceWithRateResponseDto;
 import com.example.ondongnae.backend.currency.service.ExchangeRateService;
-import com.example.ondongnae.backend.global.exception.ErrorCode;
 import com.example.ondongnae.backend.global.response.ApiResponse;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;

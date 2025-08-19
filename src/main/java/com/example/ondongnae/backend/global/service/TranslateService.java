@@ -3,8 +3,6 @@ package com.example.ondongnae.backend.global.service;
 import com.example.ondongnae.backend.global.dto.TranslateResponseDto;
 import com.example.ondongnae.backend.global.exception.BaseException;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
-import com.example.ondongnae.backend.store.dto.DescriptionCreateRequestDto;
-import com.example.ondongnae.backend.store.dto.DescriptionResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;

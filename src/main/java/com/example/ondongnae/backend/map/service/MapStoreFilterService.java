@@ -15,7 +15,6 @@ import com.example.ondongnae.backend.store.repository.StoreImageRepository;
 import com.example.ondongnae.backend.store.repository.StoreRepository;
 import com.example.ondongnae.backend.store.service.StoreDetailService;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
