@@ -56,7 +56,6 @@ public class StoreDetailService {
 
         // 7. 영업시간 조회
         List<BusinessHour> weekly = businessHourRepository.findByStoreId(storeId);
-        if (weekly.isEmpty()) throw new BaseException(ErrorCode.BUSINESS_HOUR_NOT_FOUND);
 
         // 8. 주간 영업시간 DTO 변환 (요일 순서 정렬)
         List<StoreDetailResponse.WeeklyHour> weeklyHours = weekly.stream()
