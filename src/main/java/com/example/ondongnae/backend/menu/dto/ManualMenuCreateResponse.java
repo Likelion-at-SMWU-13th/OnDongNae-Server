@@ -10,5 +10,13 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class ManualMenuCreateResponse {
-    private List<Long> menuIds;
+    private List<MenuDto> menus;
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class MenuDto {
+        private String nameKo;
+        private int priceKrw;
+    }
 }
