@@ -5,7 +5,6 @@ import com.example.ondongnae.backend.category.service.CategoryService;
 import com.example.ondongnae.backend.global.exception.BaseException;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
 import com.example.ondongnae.backend.global.response.ApiResponse;
-import com.example.ondongnae.backend.member.dto.MyProfileResponse;
 import com.example.ondongnae.backend.member.dto.SignUpDto;
 import com.example.ondongnae.backend.member.dto.RegisterStoreDto;
 import com.example.ondongnae.backend.member.dto.TokenDto;
