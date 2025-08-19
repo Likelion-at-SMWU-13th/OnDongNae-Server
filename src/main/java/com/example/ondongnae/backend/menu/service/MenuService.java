@@ -30,15 +30,12 @@ public class MenuService {
     // 메뉴 저장 (수기/OCR 공통)
     @Transactional
     public ManualMenuCreateResponse createManual(ManualMenuCreateRequest request) {
-        // 1. 토큰 -> 내 가게 ID 추출
         Long storeId = authService.getMyStoreId();
-
-        // 2. 가게 엔티티 조회
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new BaseException(ErrorCode.STORE_NOT_FOUND));
 
-        // 3. 메뉴 저장
-        List<Long> ids = new ArrayList<>();
+        List<ManualMenuCreateResponse.MenuDto> menus = new ArrayList<>();
+
         for (var item : request.getItems()) {
             var tr = translateService.translate(item.getNameKo());
             String en = nvl(tr.getEnglish(), item.getNameKo());
@@ -53,12 +50,21 @@ public class MenuService {
                     .nameZh(zh)
                     .priceKrw(item.getPriceKrw())
                     .build();
-
             menuRepository.save(menu);
-            ids.add(menu.getId());
+
+            menus.add(
+                    ManualMenuCreateResponse.MenuDto.builder()
+                            .nameKo(menu.getNameKo())
+                            .priceKrw(menu.getPriceKrw())
+                            .build()
+            );
         }
-        return ManualMenuCreateResponse.builder().menuIds(ids).build();
+
+        return ManualMenuCreateResponse.builder()
+                .menus(menus)
+                .build();
     }
+
 
     // 메뉴 목록 조회
     @Transactional(readOnly = true)
