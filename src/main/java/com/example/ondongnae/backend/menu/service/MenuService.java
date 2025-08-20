@@ -34,8 +34,23 @@ public class MenuService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new BaseException(ErrorCode.STORE_NOT_FOUND));
 
+        // 기존 메뉴 전체 삭제
+        List<Menu> existingMenus = menuRepository.findByStoreId(storeId);
+        if (!existingMenus.isEmpty()) {
+            List<Long> menuIds = existingMenus.stream()
+                    .map(Menu::getId)
+                    .toList();
+
+            // 1. 메뉴-알레르기 테이블 먼저 삭제 (FK)
+            menuAllergyRepository.deleteByMenuIds(menuIds);
+
+            // 2. 메뉴 테이블 삭제
+            menuRepository.deleteByStoreIdAndIds(storeId, menuIds);
+        }
+
         List<ManualMenuCreateResponse.MenuDto> menus = new ArrayList<>();
 
+        // 신규 메뉴 등록
         for (var item : request.getItems()) {
             var tr = translateService.translate(item.getNameKo());
             String en = nvl(tr.getEnglish(), item.getNameKo());
