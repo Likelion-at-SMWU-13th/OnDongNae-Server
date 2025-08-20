@@ -75,8 +75,14 @@ public class MenuService {
             );
         }
 
+        // 음식 관련 카테고리 여부 (알레르기 추출 여부 flag)
+        String categoryKo = store.getMainCategory().getNameKo();
+        boolean canExtractAllergy =
+                categoryKo.equals("음식점 / 카페") || categoryKo.equals("주점 / 술집");
+
         return ManualMenuCreateResponse.builder()
                 .menus(menus)
+                .canExtractAllergy(canExtractAllergy)
                 .build();
     }
 

@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 public class ManualMenuCreateResponse {
     private List<MenuDto> menus;
+    private boolean canExtractAllergy;
 
     @Getter
     @AllArgsConstructor
