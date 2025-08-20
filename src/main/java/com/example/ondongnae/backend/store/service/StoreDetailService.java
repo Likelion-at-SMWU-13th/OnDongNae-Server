@@ -3,6 +3,7 @@ package com.example.ondongnae.backend.store.service;
 import com.example.ondongnae.backend.allergy.model.Allergy;
 import com.example.ondongnae.backend.global.exception.BaseException;
 import com.example.ondongnae.backend.global.exception.ErrorCode;
+import com.example.ondongnae.backend.member.service.AuthService;
 import com.example.ondongnae.backend.menu.model.Menu;
 import com.example.ondongnae.backend.menu.repository.MenuRepository;
 import com.example.ondongnae.backend.store.dto.StoreDetailResponse;
@@ -27,6 +28,7 @@ public class StoreDetailService {
     private final MenuRepository menuRepository;
     private final BusinessHourRepository businessHourRepository;
     private final StoreIntroRepository storeIntroRepository;
+    private final AuthService authService;
 
     // 가게 상세 정보 조회
     public StoreDetailResponse getDetail(Long storeId, String lang) {
@@ -206,6 +208,17 @@ public class StoreDetailService {
             default -> en; // 기본 en
         };
     }
+
+    // 소상공인용 가게 상세 조회
+    public StoreDetailResponse getMyStoreDetail(String lang) {
+        Long storeId = authService.getMyStoreId();
+
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new BaseException(ErrorCode.STORE_NOT_FOUND));
+
+        return getDetail(store.getId(), lang);
+    }
+
 }
 
 
