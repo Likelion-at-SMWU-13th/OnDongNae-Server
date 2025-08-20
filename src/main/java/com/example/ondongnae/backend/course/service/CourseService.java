@@ -57,7 +57,6 @@ public class CourseService {
 
         // 랜덤 코스 조회
         List<Course> courses = courseRepository.pickRandom();
-        //Map<String, Object> randomCourse = new HashMap<>();
         List<RandomCourseDto> randomCourseDtos = new ArrayList<>();
 
         for (Course course : courses) {
@@ -84,7 +83,6 @@ public class CourseService {
 
             randomCourseDtos.add(randomCourseDto);
         }
-        //randomCourse.put("randomCourses", randomCourseDtos);
 
         return randomCourseDtos;
     }

@@ -95,7 +95,6 @@ public class AuthService {
 
     public TokenDto reissue(String refreshToken) {
 
-        System.out.println(refreshToken);
         if (!jwtProvider.validateToken(refreshToken))
             throw new BaseException(ErrorCode.INVALID_TOKEN, "Refresh Token이 유효하지 않습니다.");
 
