@@ -24,7 +24,7 @@ public class Store {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "member_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = true)
     private Member member;
 
     @ManyToOne
@@ -90,5 +90,5 @@ public class Store {
     }
     public void updatePhone(String phone) { this.phone = phone; }
     public void updateLatLng(Double lat, Double lng) { this.lat = lat; this.lng = lng; }
-
+    public void updateMemberNull() { this.member = null; }
 }

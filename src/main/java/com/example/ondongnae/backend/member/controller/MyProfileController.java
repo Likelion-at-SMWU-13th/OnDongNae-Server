@@ -3,6 +3,7 @@ package com.example.ondongnae.backend.member.controller;
 import com.example.ondongnae.backend.global.response.ApiResponse;
 import com.example.ondongnae.backend.member.dto.MyProfileResponse;
 import com.example.ondongnae.backend.member.dto.MyProfileUpdateRequest;
+import com.example.ondongnae.backend.member.service.MemberService;
 import com.example.ondongnae.backend.store.service.StoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class MyProfileController {
 
     private final StoreService storeService;
+    private final MemberService memberService;
 
     // 내 정보 조회
     @GetMapping
@@ -29,6 +31,12 @@ public class MyProfileController {
             @Valid @RequestBody MyProfileUpdateRequest req) {
         storeService.updateMyProfile(req);
         return ResponseEntity.ok(ApiResponse.ok("수정 완료", null));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<ApiResponse<Void>> deleteMyProfile() {
+        memberService.deleteMember();
+        return ResponseEntity.ok(ApiResponse.ok("삭제 완료", null));
     }
 
 }

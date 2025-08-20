@@ -9,5 +9,4 @@ import java.util.List;
 
 @Repository
 public interface StoreSubCategoryRepository extends JpaRepository<StoreSubCategory, Long> {
-    List<StoreSubCategory> findByStore(Store store);
 }
