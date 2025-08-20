@@ -14,7 +14,7 @@ public enum CanonicalAllergy {
     BUCKWHEAT("Buckwheat"),
     PEANUTS("Peanuts"),
     SOY("Soy"),
-    WHEAT_GLUTEN("Wheat"),
+    WHEAT_GLUTEN("Wheat (Gluten)"),
     MACKEREL("Mackerel"),
     CRAB("Crab"),
     SHRIMP("Shrimp"),
