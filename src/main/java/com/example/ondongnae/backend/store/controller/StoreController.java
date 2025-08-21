@@ -15,7 +15,7 @@ public class StoreController {
     private final StoreDetailService storeDetailService;
     private final StoreDescriptionService storeDescriptionService;
 
-    // 가게 상세 정보 조회
+    // 가게 상세 조회
     @GetMapping("/stores/{storeId}")
     public ResponseEntity<ApiResponse<StoreDetailResponse>> getStoreDetail(
             @PathVariable Long storeId,
@@ -38,6 +38,15 @@ public class StoreController {
                                                                  @RequestBody String description) {
         storeDescriptionService.updateStoreDescription(ver, description);
         return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    // 소상공인용 가게 상세 조회
+    @GetMapping("/me/store")
+    public ResponseEntity<ApiResponse<StoreDetailResponse>> getMyStoreDetail(
+            @RequestHeader(value = "Accept-Language", required = false) String lang
+    ) {
+        var data = storeDetailService.getMyStoreDetail(lang);
+        return ResponseEntity.ok(ApiResponse.ok("가게 상세 조회 성공", data));
     }
 
 }

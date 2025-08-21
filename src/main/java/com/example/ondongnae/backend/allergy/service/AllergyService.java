@@ -1,6 +1,7 @@
 package com.example.ondongnae.backend.allergy.service;
 
 import com.example.ondongnae.backend.allergy.cononical.CanonicalAllergy;
+import com.example.ondongnae.backend.allergy.cononical.AllergyCanonicalMapper;
 import com.example.ondongnae.backend.allergy.dto.AllergyApplyRequest;
 import com.example.ondongnae.backend.allergy.dto.AllergyApplyResponse;
 import com.example.ondongnae.backend.allergy.dto.AllergyExtractResponse;
@@ -23,6 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -53,12 +56,12 @@ public class AllergyService {
         var inputs = new ArrayList<Map<String,Object>>();
 
         for (Menu m : menus) {
-            var h = HeuristicAllergyEngine.analyze(m.getNameKo(), m.getNameEn(), MenuNamePreprocessor.clean(m.getNameKo()));
+            var h = HeuristicAllergyEngine.analyze(
+                    m.getNameKo(), m.getNameEn(), MenuNamePreprocessor.clean(m.getNameKo()));
             heuristics.put(m.getId(), h);
 
             // 힌트(태그) 문자열화
             List<String> hintList = h.tags().stream().map(Enum::name).toList();
-
             inputs.add(Map.of(
                     "menuId", m.getId(),
                     "nameKo", m.getNameKo(),
@@ -70,20 +73,29 @@ public class AllergyService {
 
         // 2) GPT 호출
         Map<Long, List<String>> canonByMenu = gptClient.extractCanonical(inputs);
-
         // 3) (휴리스틱 ∪ GPT) 결합
         var items = menus.stream().map(m -> {
             var h = heuristics.get(m.getId());
             Set<String> union = new LinkedHashSet<>();
 
             // 휴리스틱 결과 추가
-            for (CanonicalAllergy c : h.allergens()) union.add(c.labelEn());
-            // GPT 결과 추가
+            for (CanonicalAllergy c : h.allergens()) union.add(c.labelEn());            // GPT 결과 추가
             union.addAll(canonByMenu.getOrDefault(m.getId(), List.of()));
+
+            // 캐논EN -> 한국어 라벨 매핑
+            List<String> koLabels = union.stream()
+                    .map(CanonicalAllergy::fromEnglish)  // String -> CanonicalAllergy
+                    .filter(Objects::nonNull)
+                    .map(AllergyCanonicalMapper::ko)     // CanonicalAllergy -> ko 라벨
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .sorted()
+                    .toList();
 
             return new AllergyExtractResponse.Item(
                     m.getId(),
                     m.getNameKo(),
+                    koLabels,
                     List.copyOf(union)
             );
         }).toList();
