@@ -20,9 +20,9 @@ public class MyProfileUpdateRequest {
     private String storePhone;
 
     // 두 칸 모두 들어와야 변경 처리
-    @Size(min = 8, max = 64)
+    @Size(min = 4, max = 64)
     private String newPassword;
 
-    @Size(min = 8, max = 64)
+    @Size(min = 4, max = 64)
     private String confirmPassword;
 }
