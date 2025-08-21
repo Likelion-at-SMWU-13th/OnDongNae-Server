@@ -56,7 +56,6 @@ public class CourseController {
     @PostMapping("/recommend")
     public ResponseEntity<ApiResponse<?>> courseRecommendation(@RequestHeader(name="Accept-Language", required = false) String language,
                                                            @Valid @RequestBody SelectedOptionDto selectedOptionDto) {
-        System.out.println("lang" + language);
         CourseRecommendResponseDto courseRecommendation = courseRecommendationService.getCourseRecommendationByAI(selectedOptionDto, language);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.ok(courseRecommendation));
