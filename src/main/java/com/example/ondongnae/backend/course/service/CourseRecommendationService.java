@@ -95,7 +95,8 @@ public class CourseRecommendationService {
             String imageUrl = storeImageRepository.findFirstByStoreOrderByOrderAsc(store).getUrl();
 
             RecommendedCourseStoreDto dto = RecommendedCourseStoreDto.builder().name(storeName)
-                    .longDescription(longIntro).shortDescription(shortIntro).order(order).imageUrl(imageUrl).build();
+                    .longDescription(longIntro).shortDescription(shortIntro).order(order)
+                    .imageUrl(imageUrl).id(store.getId()).build();
             recommendedCourseStoreDtoList.add(dto);
         }
 

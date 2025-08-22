@@ -12,5 +12,6 @@ public class RecommendedCourseStoreDto {
     private String shortDescription;
     private long order;
     private String imageUrl;
+    private Long id;
 
 }
