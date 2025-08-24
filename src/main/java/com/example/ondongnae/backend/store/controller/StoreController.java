@@ -1,0 +1,52 @@
+package com.example.ondongnae.backend.store.controller;
+
+import com.example.ondongnae.backend.global.response.ApiResponse;
+import com.example.ondongnae.backend.store.dto.StoreDetailResponse;
+import com.example.ondongnae.backend.store.service.StoreDescriptionService;
+import com.example.ondongnae.backend.store.service.StoreDetailService;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequiredArgsConstructor
+public class StoreController {
+    private final StoreDetailService storeDetailService;
+    private final StoreDescriptionService storeDescriptionService;
+
+    // 가게 상세 조회
+    @GetMapping("/stores/{storeId}")
+    public ResponseEntity<ApiResponse<StoreDetailResponse>> getStoreDetail(
+            @PathVariable Long storeId,
+            @RequestHeader(value = "Accept-Language", required = false) String acceptLanguage
+    ) {
+        var data = storeDetailService.getDetail(storeId, acceptLanguage);
+        return ResponseEntity.ok(ApiResponse.ok("가게 상세 조회 성공", data));
+    }
+
+    // 가게 설명 조회
+    @GetMapping("/me/store/description")
+    public ResponseEntity<ApiResponse<?>> getStoreDetailDescription(@RequestParam String ver) {
+        Object storeDescription = storeDescriptionService.getStoreDescription(ver);
+        return ResponseEntity.ok(ApiResponse.ok(storeDescription));
+    }
+
+    // 가게 설명 수정
+    @PatchMapping("/me/store/description")
+    public ResponseEntity<ApiResponse<?>> updateStoreDescription(@RequestParam String ver,
+                                                                 @RequestBody String description) {
+        storeDescriptionService.updateStoreDescription(ver, description);
+        return ResponseEntity.ok(ApiResponse.ok(null));
+    }
+
+    // 소상공인용 가게 상세 조회
+    @GetMapping("/me/store")
+    public ResponseEntity<ApiResponse<StoreDetailResponse>> getMyStoreDetail(
+            @RequestHeader(value = "Accept-Language", required = false) String lang
+    ) {
+        var data = storeDetailService.getMyStoreDetail(lang);
+        return ResponseEntity.ok(ApiResponse.ok("가게 상세 조회 성공", data));
+    }
+
+}
