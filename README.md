@@ -1,4 +1,5 @@
 #  GoruGoru 🛍️
+<img height="900" alt="표지" src="https://github.com/user-attachments/assets/a985facb-c21f-49ce-b7fd-d6ebcee059d7" />
 
 ### 2025 멋쟁이사자처럼 중앙해커톤 - '온동네'팀
 > 기간 : 25. 07. 27 ~ 25. 08. 26.
@@ -27,7 +28,10 @@ GoruGoru는 **용산구 전통시장의 활력을 되살리고, 지역 경제 �
 </br>
 
 ### 𝗣𝗿𝗼𝗷𝗲𝗰𝘁 𝗺𝗼𝘁𝗶𝘃𝗮𝘁𝗶𝗼𝗻
+<img height="1080" alt="문제" src="https://github.com/user-attachments/assets/8a9e1fa5-f9eb-4e86-8736-d3022c3afb4a" />
 
+
+</br></br>
 
 ### 👩‍💻 역할 분담
 | &nbsp;&nbsp;이&nbsp;름&nbsp;&nbsp; | 프로필                                                              |  역할 |                                    역할분담                         |
@@ -37,9 +41,16 @@ GoruGoru는 **용산구 전통시장의 활력을 되살리고, 지역 경제 �
 
 </br>
 
-### 💡 주요 기능
-
+### 💡 소상공인 주요 기능
+<img height="900" alt="핵심 기능 - 소상공인1 (완료)" src="https://github.com/user-attachments/assets/fc13a9a2-4ae0-427f-80ea-2d930c80d607" />
+<img height="900" alt="핵심 기능 - 소상공인2 (완료) - 후보2" src="https://github.com/user-attachments/assets/b8535c1f-d1d0-464e-959f-491bb3acbc2e" />
 </br>
+### 💡 고객 (외국인 관광객) 주요 기능
+
+<img height="900" alt="핵심 기능 - 고객1 (후보)" src="https://github.com/user-attachments/assets/aed8222e-fcca-4b83-8f99-ca50799b98f4" />
+<img height="900" alt="핵심 기능 - 고객2" src="https://github.com/user-attachments/assets/5678e046-4ebf-443c-96a2-c0e1dbe114cf" />
+
+</br></br>
 
 ### 🛠 기술 스택
 <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/> <img src="https://img.shields.io/badge/springsecurity-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"/>
