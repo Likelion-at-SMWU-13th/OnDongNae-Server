@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 import static com.example.ondongnae.backend.allergy.cononical.CanonicalAllergy.*;
+import static java.lang.System.out;
 
 
 /**
@@ -24,6 +25,8 @@ public final class HeuristicAllergyEngine {
             Pattern.CASE_INSENSITIVE);
     private static final Pattern P_RICE_NOODLE = Pattern.compile("(쌀국수|pho|rice\\s*noodle)", Pattern.CASE_INSENSITIVE);
     private static final Pattern P_BUCKWHEAT = Pattern.compile("(메밀|소바|soba|buckwheat)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern P_TTEOKBOKKI =
+            Pattern.compile("(떡볶이|국물떡볶이|로제떡볶이|치즈떡볶이|마라떡볶이|짜장떡볶이)", Pattern.CASE_INSENSITIVE);
 
     private static final Pattern P_FRIED = Pattern.compile("(튀김|전|부침|tempura|fried|batter|breaded|panko|팡코|빵가루)", Pattern.CASE_INSENSITIVE);
     private static final Pattern P_CUTLET = Pattern.compile("(돈까스|돈가스|카츠|katsu|tonkatsu|cutlet)", Pattern.CASE_INSENSITIVE);
@@ -104,7 +107,6 @@ public final class HeuristicAllergyEngine {
         if (P_NOODLE.matcher(text).find()) tags.add(DishTag.NOODLE);
         if (P_RICE_NOODLE.matcher(text).find()) tags.add(DishTag.RICE_NOODLE);
         if (P_BUCKWHEAT.matcher(text).find()) tags.add(DishTag.BUCKWHEAT_BASE);
-
         if (P_FRIED.matcher(text).find()) tags.add(DishTag.FRIED_OR_BATTER);
         if (P_CUTLET.matcher(text).find()) tags.add(DishTag.CUTLET);
         if (P_DUMPLING.matcher(text).find()) tags.add(DishTag.DUMPLING);
@@ -147,6 +149,10 @@ public final class HeuristicAllergyEngine {
         }
         if (P_WALNUT_CAKE.matcher(text).find()) {
             out.add(WALNUTS);
+            out.add(WHEAT_GLUTEN);
+        }
+        if (P_TTEOKBOKKI.matcher(text).find()) {
+            out.add(SOY);
             out.add(WHEAT_GLUTEN);
         }
         if (P_SAEUJEOT.matcher(text).find()) out.add(SHRIMP);
