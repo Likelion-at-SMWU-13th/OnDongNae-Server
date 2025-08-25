@@ -45,6 +45,7 @@ GoruGoru는 **용산구 전통시장의 활력을 되살리고, 지역 경제 �
 <img height="900" alt="핵심 기능 - 소상공인1 (완료)" src="https://github.com/user-attachments/assets/fc13a9a2-4ae0-427f-80ea-2d930c80d607" />
 <img height="900" alt="핵심 기능 - 소상공인2 (완료) - 후보2" src="https://github.com/user-attachments/assets/b8535c1f-d1d0-464e-959f-491bb3acbc2e" />
 </br>
+
 ### 💡 고객 (외국인 관광객) 주요 기능
 
 <img height="900" alt="핵심 기능 - 고객1 (후보)" src="https://github.com/user-attachments/assets/aed8222e-fcca-4b83-8f99-ca50799b98f4" />
