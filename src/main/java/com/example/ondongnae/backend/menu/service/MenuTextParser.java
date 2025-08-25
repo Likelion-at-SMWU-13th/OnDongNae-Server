@@ -19,9 +19,9 @@ import java.util.regex.Pattern;
 @Component
 public class MenuTextParser {
 
-    // 숫자 토큰: (숫자)(통화)?  |  (수량숫자)(수량단위)
+    // 숫자 토큰: (숫자 또는 소수)(통화)?  |  (수량숫자)(수량단위)
     private static final Pattern NUM_TOKEN = Pattern.compile(
-            "(\\d{1,3}(?:,\\d{3})+|\\d+)\\s*(원|₩|￦|krw|won)?"
+            "(\\d{1,3}(?:,\\d{3})+|\\d+(?:\\.\\d{1,2})?)\\s*(원|₩|￦|krw|won)?"
                     + "|(\\d+)\\s*(개|pcs|份|个|碗|잔|장|인분|그릇)",
             Pattern.CASE_INSENSITIVE
     );
@@ -29,8 +29,11 @@ public class MenuTextParser {
     private static final Set<String> CURRENCY = Set.of("원","₩","￦","krw","won");
     private static final Set<String> QTY_UNIT = Set.of("개","pcs","份","个","碗","잔","장","인분","그릇");
 
-    // 사이즈 토큰(대/중/소/大/中/小) - 괄호 포함/미포함
+    // 사이즈 토큰(대/중/소/大/中/小)
     private static final Pattern SIZE_TOKEN = Pattern.compile("(?:\\(|\\s|^)(대|중|소|大|中|小)(?:\\)|\\s|$)");
+
+    // 숫자만/통화기호만 있는지 검사 (가격 전용 줄 판별)
+    private static final Pattern PRICE_ONLY_LINE = Pattern.compile("^[\\s\\d.,·∙•₩￦wonkrWON]+$");
 
     public List<OcrExtractItemDto> parse(String raw) {
         if (raw == null || raw.isBlank()) return List.of();
@@ -38,22 +41,50 @@ public class MenuTextParser {
         String[] lines = raw.replace('\u00A0', ' ').split("\\r?\\n");
         List<OcrExtractItemDto> out = new ArrayList<>();
 
-        for (String origin : lines) {
-            String line = normalize(origin);
+        String pendingNameLine = null; // 이름만 있는 줄을 임시 보관
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = normalize(lines[i]);
             if (line.isBlank()) continue;
 
-            // 한 줄에서 여러 (name, price) 페어를 뽑음
+            // 전부 영문 대문자 헤더(카테고리)면 스킵
+            if (likelyHeader(line)) {
+                pendingNameLine = null;
+                continue;
+            }
+
+            // 소수 깨짐 복구 (예: "3 . 5" / "3 · 5" → "3.5")
+            line = fixBrokenDecimals(line);
+
+            boolean hasDigit = containsDigit(line);
+            boolean priceOnly = isPriceOnlyLine(line);
+
+            // (A) 이전 줄이 "이름만" 있었고, 이번 줄이 "가격만"이면 합쳐서 파싱
+            if (pendingNameLine != null && priceOnly) {
+                String merged = pendingNameLine + " " + line;
+                out.addAll(extractPairsFromLine(merged));
+                pendingNameLine = null;
+                continue;
+            }
+
+            // (B) 이번 줄에 숫자가 없으면: 이름만 가능 → 보관
+            if (!hasDigit) {
+                pendingNameLine = line;
+                continue;
+            }
+
+            // (C) 숫자가 있으면 이 줄 자체를 파싱
             out.addAll(extractPairsFromLine(line));
+            pendingNameLine = null; // 새로 숫자를 봤으니 보관 초기화
         }
+
         return out;
     }
 
-    // 한 줄에서 [이름 ... 가격] 페어를 여러 개 추출
+    /** 한 줄에서 [이름 ... 가격] 페어 여러 개 추출 */
     private List<OcrExtractItemDto> extractPairsFromLine(String line) {
         List<OcrExtractItemDto> result = new ArrayList<>();
 
-        // 사이즈 토큰은 전역 제거 대신, 세그먼트별로 발견되면 이름에만 반영하기 위해
-        // 일단 원문 라인에서 숫자 토큰 위치만 수집
         Matcher m = NUM_TOKEN.matcher(line);
         List<Token> tokens = new ArrayList<>();
         while (m.find()) {
@@ -69,66 +100,72 @@ public class MenuTextParser {
             }
         }
 
-        // 토큰이 없으면: 가격 없는 단독 이름일 수 있으니 전체를 한 항목으로 (price=null)
-        if (tokens.isEmpty()) {
-            String name = applySizeSuffix(line.trim());
-            if (!isNoise(name)) result.add(new OcrExtractItemDto(name, null));
-            return result;
-        }
+        if (tokens.isEmpty()) return result;
 
-        // 왼쪽 → 오른쪽으로 스캔하며 "가격 후보" 토큰을 만날 때마다 직전 세그먼트를 이름으로
         int cut = 0;
         for (int i = 0; i < tokens.size(); i++) {
             Token t = tokens.get(i);
-            if (t.type != TokenType.NUMBER) continue;                 // 수량 토큰은 건너뜀
-            if (!isPriceCandidate(t.num, t.currency)) continue;       // 가격 조건 미충족이면 스킵
+            if (t.type != TokenType.NUMBER) continue;
+            if (!isPriceCandidate(t.num, t.currency)) continue;
 
-            // 이름 후보: 직전 컷 ~ 가격 토큰 시작
             String nameSeg = line.substring(cut, t.start).trim();
             nameSeg = applySizeSuffix(nameSeg);
             if (!isNoise(nameSeg)) {
-                Integer price = parsePrice(t.num);
+                Integer price = parsePriceFlexible(t.num);
                 result.add(new OcrExtractItemDto(nameSeg, price));
             }
-
-            // 다음 세그먼트 시작 지점을 가격 토큰 끝으로 이동
             cut = t.end;
         }
 
-        // 마지막으로 잘린 뒤에 남은 꼬리 텍스트가 의미 있는 "이름"이라면 price=null로 추가
+        // 마지막 꼬리 텍스트가 의미 있으면 price=null (선호에 따라 유지/제거 가능)
         String tail = line.substring(cut).trim();
         tail = applySizeSuffix(tail);
-        if (!tail.isBlank() && !isNoise(tail)) {
-            result.add(new OcrExtractItemDto(tail, null));
+        if (!tail.isBlank() && !isNoise(tail) && containsDigit(tail)) {
+            // tail 안에 숫자가 또 있으면 위 루프에서 이미 처리되므로,
+            // 여기서는 숫자 없는 의미있는 꼬리만 남도록 보통은 추가하지 않음.
         }
-
         return result;
     }
 
-    // 가격 후보 판단 규칙
+    /** 가격 후보 판단 */
     private boolean isPriceCandidate(String num, String currencyRaw) {
         if (num == null) return false;
 
-        // 1) 통화 동반
+        // 1) 통화 단위 동반
         if (currencyRaw != null) {
             String c = currencyRaw.toLowerCase(Locale.ROOT);
             if (CURRENCY.contains(c) || CURRENCY.contains(currencyRaw)) return true;
         }
-        // 2) 콤마 포함(천단위)
+        // 2) 소수 표기(3.0/3.5 등) → 가격으로 인정(×1000 처리)
+        if (num.contains(".")) return true;
+
+        // 3) 콤마 포함(천단위)
         if (num.contains(",")) return true;
 
-        // 3) 자리수 >= 4(>=1000)
+        // 4) 자리수 ≥ 4(>=1000)
         String plain = num.replace(",", "");
         if (plain.length() >= 4) return true;
 
-        // 4) 하한선 (>= 500)
-        Integer p = parsePrice(num);
+        // 5) 하한선(>=500)
+        Integer p = parsePriceFlexible(num);
         return p != null && p >= 500;
     }
 
-    private Integer parsePrice(String s) {
-        try { return Integer.parseInt(s.replace(",", "")); }
-        catch (Exception e) { return null; }
+    /** 정수/콤마/소수 모두 처리. 소수면 ×1000원 */
+    private Integer parsePriceFlexible(String s) {
+        try {
+            String plain = s.replace(",", "");
+            if (plain.contains(".")) {
+                double v = Double.parseDouble(plain);
+                if (v >= 0.5 && v <= 99.0) {
+                    return (int) Math.round(v * 1000.0);
+                }
+                return null; // 비정상 소수는 배제
+            }
+            return Integer.parseInt(plain);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     // 유틸
@@ -140,7 +177,30 @@ public class MenuTextParser {
                 .trim();
     }
 
-    // 세그먼트 내의 사이즈 토큰(대/중/소/大/中/小)을 검출해 이름에 괄호로 붙임
+    /** "3 . 5", "3 · 5", "3 • 5" → "3.5" 로 복구 */
+    private String fixBrokenDecimals(String s) {
+        return s.replaceAll("(\\d)\\s*[\\.,·∙•]\\s*(\\d{1,2})", "$1.$2");
+    }
+
+    private boolean containsDigit(String s) {
+        return s != null && s.matches(".*\\d.*");
+    }
+
+    private boolean isPriceOnlyLine(String s) {
+        return s != null && PRICE_ONLY_LINE.matcher(s).matches();
+    }
+
+    /** 전부 영문 대문자(또는 공백/& 한정)이고 한글이 없으면 헤더로 간주 */
+    private boolean likelyHeader(String s) {
+        if (s == null) return false;
+        if (s.matches(".*[가-힣].*")) return false; // 한글 포함 → 헤더 아님
+        String letters = s.replaceAll("[^A-Za-z]", "");
+        if (letters.length() < 3) return false;
+        long upper = letters.chars().filter(Character::isUpperCase).count();
+        double ratio = upper / (double) letters.length();
+        return ratio >= 0.7; // 대문자 비율 70% 이상이면 헤더로 판단
+    }
+
     private String applySizeSuffix(String seg) {
         if (seg == null || seg.isBlank()) return seg;
         Matcher m = SIZE_TOKEN.matcher(seg);
@@ -167,13 +227,14 @@ public class MenuTextParser {
     }
 
     // 내부 자료구조
+
     private enum TokenType { NUMBER, QUANTITY }
 
     private static class Token {
         final TokenType type;
         final int start, end;
-        final String num;       // NUMBER: 숫자, QUANTITY: 수량 숫자
-        final String currency;  // NUMBER에서만 사용
+        final String num;
+        final String currency;
 
         private Token(TokenType type, int start, int end, String num, String currency) {
             this.type = type; this.start = start; this.end = end; this.num = num; this.currency = currency;
@@ -182,7 +243,6 @@ public class MenuTextParser {
             return new Token(TokenType.NUMBER, s, e, num, currency);
         }
         static Token quantity(int s, int e, String qtyNum, String qtyUnit) {
-            // 수량은 가격 결정에서 제외(이름에만 남게 함). qtyUnit은 사용하지 않음
             return new Token(TokenType.QUANTITY, s, e, qtyNum, null);
         }
     }
