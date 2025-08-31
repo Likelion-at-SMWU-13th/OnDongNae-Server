@@ -1,5 +1,6 @@
 #  GoruGoru 🛍️
-<img height="900" alt="표지" src="https://github.com/user-attachments/assets/a985facb-c21f-49ce-b7fd-d6ebcee059d7" />
+<img height="900" alt="표지" src="https://github.com/user-attachments/assets/a985facb-c21f-49ce-b7fd-d6ebcee059d7" /> </br>
+## 🏆멋쟁이사자처럼 대학 13기 중앙해커톤 본선 진출작🏆
 
 ### 2025 멋쟁이사자처럼 대학 13기 중앙해커톤 - '온동네'팀
 > 외국인을 위한 용산 전통시장 다국어 AI 가이드 플랫폼
@@ -43,7 +44,7 @@ GoruGoru는 **용산구 전통시장의 활력을 되살리고, 지역 경제 �
 | 박소연 | <img width="160" alt="image" src="https://github.com/user-attachments/assets/a67f82fb-775a-4f0b-96e6-04f690fcf064" /> | FE | onboarding, 회원가입, 가게 설명, 나의 가게, map, rates, 배포 |
 | 정교은 | <img width="160" alt="image" src="https://github.com/user-attachments/assets/a8adcdbe-6f06-4f4e-8c45-0509a6acc534" /> | FE | onboading, 메뉴, 영업시간, overview, course, 배포 |
 | 이경은 | <img width="100" alt="미모티콘2" src="https://github.com/user-attachments/assets/b73bb37f-1ada-4c0f-83f3-bb199e2e65b7" /> | BE | 회원가입/로그인, GPT + RAG 기반 코스 추천, GPT 기반 가게 설명 생성, 배포 |
-| 이혜지 | <img width="160" alt="1" src="https://github.com/user-attachments/assets/083c72bb-4ab8-4dfd-a419-83207d3a1b71" /> | BE | 메뉴 관리(OCR/GPT), 영업시간 관리, 가게 정보 관리, 알레르기 정보 관리 |
+| 이혜지 | <img width="160" alt="1" src="https://github.com/user-attachments/assets/083c72bb-4ab8-4dfd-a419-83207d3a1b71" /> | BE | OCR 기반 메뉴 관리, 영업시간 관리, 가게 정보 관리, GPT + 휴리스틱 기반 알레르기 정보 관리 |
 
 </br>
 
